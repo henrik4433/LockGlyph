@@ -96,7 +96,7 @@
             <key>color_key</key>
             <string>primaryColor</string>
             <key>title</key>
-            <string>Scanning color</string>
+            <string>Scanning colour</string>
             <key>color_fallback</key>
             <string>#BCBCBC</string>
             <key>usesRGB</key>
@@ -105,6 +105,16 @@
             <true/>
             <key>color_postNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+        </dict>
+        <dict>
+            <key>cell</key>
+            <string>PSButtonCell</string>
+            <key>id</key>
+			<string>resetColorsButton</string>
+            <key>action</key>
+            <string>resetColors</string>
+            <key>label</key>
+            <string>Reset colours to default</string>
         </dict>
 		<dict>
 			<key>cell</key>
