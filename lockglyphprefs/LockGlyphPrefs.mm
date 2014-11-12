@@ -66,7 +66,7 @@
     		CFPreferencesAppSynchronize(CFSTR("com.evilgoldfish.lockglyph"));
     		CFNotificationCenterPostNotification(
     			CFNotificationCenterGetDarwinNotifyCenter(),
-    			CFSTR("com.evilgoldfish.lockglyph"),
+    			CFSTR("com.evilgoldfish.lockglyph.settingschanged"),
     			NULL,
     			NULL,
     			YES
