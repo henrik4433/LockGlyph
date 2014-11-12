@@ -48,8 +48,7 @@ static void loadPreferences() {
 
 %hook SBLockScreenScrollView
 
--(UIView *)initWithFrame:(CGRect)frame {
-	lockView = %orig;
+-(void)didMoveToWindow {
 	if (enabled) {
 		lockView = (UIView *)self;
 		usingGlyph = YES;
@@ -62,7 +61,6 @@ static void loadPreferences() {
 		fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
 		[self addSubview:fingerglyph];
 	}
-	return lockView;
 }
 
 %new(v@:)
