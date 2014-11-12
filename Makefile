@@ -1,4 +1,8 @@
-include theos/makefiles/common.mk
+include $(THEOS)/makefiles/common.mk
+
+ARCHS = armv7 armv7s arm64
+
+TARGET = iphone:clang:latest:8.0
 
 TWEAK_NAME = LockGlyph
 LockGlyph_FILES = Tweak.xm

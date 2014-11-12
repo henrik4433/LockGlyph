@@ -57,6 +57,7 @@ static void loadPreferences() {
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
 		fingerglyph.secondaryColor = secondaryColor;
 		fingerglyph.primaryColor = primaryColor;
+		fingerglyph.userInteractionEnabled = NO;
 		CGRect screen = [[UIScreen mainScreen] bounds];
 		fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
 		[self addSubview:fingerglyph];
@@ -127,14 +128,15 @@ static void loadPreferences() {
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)arg2 {
 	%orig;
 	//start animation
-	if (lockView && self.isUILocked && enabled) {
-		switch (arg2) {
+	if (lockView && self.isUILocked && enabled && arg2 == TouchIDFingerDown) {
+		[lockView performSelectorOnMainThread:@selector(performFingerScanAnimation) withObject:nil waitUntilDone:YES];
+		/*switch (arg2) {
 			case TouchIDFingerDown:
 				[lockView performSelectorOnMainThread:@selector(performFingerScanAnimation) withObject:nil waitUntilDone:YES];
 				break;
 			case TouchIDFingerUp:
 				// revert to state 0 here
-		}
+		}*/
 	}
 }
 

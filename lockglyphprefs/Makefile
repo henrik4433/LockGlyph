@@ -1,4 +1,4 @@
-include theos/makefiles/common.mk
+include $(THEOS)/makefiles/common.mk
 $(shell install_name_tool -id /usr/lib/libcolorpicker_LockGlyph.dylib lib/libcolorpicker.dylib)
 
 BUNDLE_NAME = LockGlyphPrefs

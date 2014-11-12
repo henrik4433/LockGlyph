@@ -81,7 +81,7 @@
             <true/>
             <key>usesAlpha</key>
             <true/>
-            <key>PostNotification</key>
+            <key>color_postNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
         </dict>
         <dict>
@@ -103,7 +103,7 @@
             <true/>
             <key>usesAlpha</key>
             <true/>
-            <key>PostNotification</key>
+            <key>color_postNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
         </dict>
 		<dict>
