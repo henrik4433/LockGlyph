@@ -16,7 +16,7 @@ UIView *lockView = nil;
 PKGlyphView *fingerglyph = nil;
 SystemSoundID unlockSound;
 
-BOOL fingerAlreadyFailed;
+BOOL authenticated;
 BOOL usingGlyph;
 
 BOOL enabled;
@@ -52,6 +52,7 @@ static void loadPreferences() {
 	if (enabled) {
 		lockView = (UIView *)self;
 		usingGlyph = YES;
+		authenticated = NO;
 		fingerglyph = [[%c(PKGlyphView) alloc] initWithStyle:1];
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
 		fingerglyph.secondaryColor = secondaryColor;
@@ -65,10 +66,12 @@ static void loadPreferences() {
 
 %new(v@:)
 -(void)performFingerScanAnimation {
-	if (!fingerAlreadyFailed) {
-		[fingerglyph setState:1 animated:YES completionHandler:nil];
-		fingerAlreadyFailed = YES;
-	}
+	[fingerglyph setState:1 animated:YES completionHandler:nil];
+}
+
+%new
+- (void)resetFingerScanAnimation {
+	[fingerglyph setState:0 animated:YES completionHandler:nil];
 }
 
 %new(v@:)
@@ -96,14 +99,35 @@ static void loadPreferences() {
 
 %end*/
 
+%hook PKFingerprintGlyphView
+
+-(void)_setProgress:(double)arg1 withDuration:(double)arg2 forShapeLayerAtIndex:(unsigned long long)arg {
+	if (lockView && enabled) {
+		if (authenticated) {
+			arg2 = MIN(arg2, 0.1);
+		} else {
+			arg1 = MIN(arg1, 0.8);
+			arg2 *= 0.5;
+		}
+	}
+	%orig;
+}
+
+- (double)_minimumAnimationDurationForStateTransition {
+	return authenticated ? 0.1 : %orig;
+}
+
+%end
+
 %hook SBLockScreenManager
 
 - (void)_bioAuthenticated:(id)arg1 {
 	if (lockView && self.isUILocked && enabled) {
+		authenticated = YES;
 		[lockView performSelectorOnMainThread:@selector(performTickAnimation) withObject:nil waitUntilDone:YES];
-		double delayInSeconds = 1.3;
+		double delayInSeconds = 0.5;
 		if (!useTickAnimation) {
-			delayInSeconds = 0.3;
+			delayInSeconds = 0.1;
 		}
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
 		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ 
@@ -112,7 +136,6 @@ static void loadPreferences() {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
 			fingerglyph.delegate = nil;
-			fingerAlreadyFailed = NO;
 			usingGlyph = NO;
 			lockView = nil;
 			//[fingerglyph removeFromSuperview];
@@ -126,15 +149,15 @@ static void loadPreferences() {
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)arg2 {
 	%orig;
 	//start animation
-	if (lockView && self.isUILocked && enabled && arg2 == TouchIDFingerDown) {
-		[lockView performSelectorOnMainThread:@selector(performFingerScanAnimation) withObject:nil waitUntilDone:YES];
-		/*switch (arg2) {
+	if (lockView && self.isUILocked && enabled && !authenticated) {
+		switch (arg2) {
 			case TouchIDFingerDown:
 				[lockView performSelectorOnMainThread:@selector(performFingerScanAnimation) withObject:nil waitUntilDone:YES];
 				break;
 			case TouchIDFingerUp:
-				// revert to state 0 here
-		}*/
+				[lockView performSelectorOnMainThread:@selector(resetFingerScanAnimation) withObject:nil waitUntilDone:YES];
+				break;
+		}
 	}
 }
 
