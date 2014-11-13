@@ -191,6 +191,20 @@ static void loadPreferences() {
 
 %end
 
+%hook SBLockScreenViewController
+
+- (void) willAnimateRotationToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+	%orig;
+	CGRect screen = [[UIScreen mainScreen] bounds];
+	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
+		fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
+	} else {
+		fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+	}
+}
+
+%end
+
 %ctor {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
