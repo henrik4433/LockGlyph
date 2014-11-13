@@ -22,6 +22,7 @@ BOOL usingGlyph;
 BOOL enabled;
 BOOL useUnlockSound;
 BOOL useTickAnimation;
+BOOL useFasterAnimations;
 UIColor *primaryColor;
 UIColor *secondaryColor;
 
@@ -42,6 +43,7 @@ static void loadPreferences() {
     enabled = !CFPreferencesCopyAppValue(CFSTR("enabled"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("enabled"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	useUnlockSound = !CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	useTickAnimation = !CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+ 	useFasterAnimations = !CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	primaryColor = !CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultPrimaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
  	secondaryColor = !CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultSecondaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
 }
@@ -102,7 +104,7 @@ static void loadPreferences() {
 %hook PKFingerprintGlyphView
 
 -(void)_setProgress:(double)arg1 withDuration:(double)arg2 forShapeLayerAtIndex:(unsigned long long)arg {
-	if (lockView && enabled) {
+	if (lockView && enabled && useFasterAnimations) {
 		if (authenticated) {
 			arg2 = MIN(arg2, 0.1);
 		} else {
@@ -114,7 +116,7 @@ static void loadPreferences() {
 }
 
 - (double)_minimumAnimationDurationForStateTransition {
-	return authenticated ? 0.1 : %orig;
+	return authenticated && useFasterAnimations ? 0.1 : %orig;
 }
 
 %end
@@ -125,9 +127,15 @@ static void loadPreferences() {
 	if (lockView && self.isUILocked && enabled) {
 		authenticated = YES;
 		[lockView performSelectorOnMainThread:@selector(performTickAnimation) withObject:nil waitUntilDone:YES];
-		double delayInSeconds = 0.5;
+		double delayInSeconds = 1.3;
 		if (!useTickAnimation) {
-			delayInSeconds = 0.1;
+			delayInSeconds = 0.3;
+		}
+		if (useFasterAnimations) {
+			delayInSeconds = 0.5;
+			if (!useTickAnimation) {
+				delayInSeconds = 0.1;
+			}
 		}
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
 		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ 
