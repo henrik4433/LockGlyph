@@ -15,10 +15,6 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string> </string>
-			<key>footerText</key>
-			<string>Use faster animations will make LockGlyph go much faster.</string>
-			<key>footerAlignment</key>
-			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -30,7 +26,7 @@
 			<key>key</key>
 			<string>enabled</string>
 			<key>label</key>
-			<string>Enabled</string>
+			<string>Enable LockGlyph</string>
 			<key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
 		</dict>
@@ -47,6 +43,16 @@
 			<string>Enable unlock sound</string>
 			<key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Animations</string>
+			<key>footerText</key>
+			<string>Use faster animations will make LockGlyph animate much faster.</string>
+			<key>footerAlignment</key>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -75,6 +81,12 @@
 			<string>Use faster animations</string>
 			<key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Colours</string>
 		</dict>
 		<dict>
             <key>cell</key>
@@ -130,6 +142,40 @@
             <key>label</key>
             <string>Reset colours to default</string>
         </dict>
+        <dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Failed unlock action</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>vibrateOnIncorrectFinger</string>
+			<key>label</key>
+			<string>Vibrate</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>shakeOnIncorrectFinger</string>
+			<key>label</key>
+			<string>Shake fingerprint</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>

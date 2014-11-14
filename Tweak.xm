@@ -17,12 +17,15 @@ PKGlyphView *fingerglyph = nil;
 SystemSoundID unlockSound;
 
 BOOL authenticated;
+BOOL shouldNotDelay;
 BOOL usingGlyph;
 
 BOOL enabled;
 BOOL useUnlockSound;
 BOOL useTickAnimation;
 BOOL useFasterAnimations;
+BOOL vibrateOnIncorrectFinger;
+BOOL shakeOnIncorrectFinger;
 UIColor *primaryColor;
 UIColor *secondaryColor;
 
@@ -44,7 +47,9 @@ static void loadPreferences() {
  	useUnlockSound = !CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	useTickAnimation = !CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	useFasterAnimations = !CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	primaryColor = !CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultPrimaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
+	vibrateOnIncorrectFinger = !CFPreferencesCopyAppValue(CFSTR("vibrateOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("vibrateOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+ 	shakeOnIncorrectFinger = !CFPreferencesCopyAppValue(CFSTR("shakeOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("shakeOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	primaryColor = !CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultPrimaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
  	secondaryColor = !CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultSecondaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
 }
 
@@ -76,6 +81,17 @@ static void loadPreferences() {
 	[fingerglyph setState:0 animated:YES completionHandler:nil];
 }
 
+%new
+- (void)performShakeFingerFailAnimation {
+	CABasicAnimation *shakeanimation = [CABasicAnimation animationWithKeyPath:@"position"];
+	[shakeanimation setDuration:0.05];
+	[shakeanimation setRepeatCount:4];
+	[shakeanimation setAutoreverses:YES];
+	[shakeanimation setFromValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x - 10, fingerglyph.center.y)]];
+	[shakeanimation setToValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x + 10, fingerglyph.center.y)]];
+	[[fingerglyph layer] addAnimation:shakeanimation forKey:@"position"];
+}
+
 %new(v@:)
 -(void)performTickAnimation {
 	[fingerglyph setState:6 animated:YES completionHandler:nil];
@@ -90,21 +106,10 @@ static void loadPreferences() {
 
 %end
 
-/*%hook PKGlyphView
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
-{
-	%orig;
-	if (usingGlyph && )
-	//lel
-}
-
-%end*/
-
 %hook PKFingerprintGlyphView
 
 -(void)_setProgress:(double)arg1 withDuration:(double)arg2 forShapeLayerAtIndex:(unsigned long long)arg {
-	if (lockView && enabled && useFasterAnimations) {
+	if (lockView && enabled && useFasterAnimations && usingGlyph) {
 		if (authenticated) {
 			arg2 = MIN(arg2, 0.1);
 		} else {
@@ -116,7 +121,7 @@ static void loadPreferences() {
 }
 
 - (double)_minimumAnimationDurationForStateTransition {
-	return authenticated && useFasterAnimations ? 0.1 : %orig;
+	return authenticated && useFasterAnimations && usingGlyph ? 0.1 : %orig;
 }
 
 %end
@@ -124,7 +129,7 @@ static void loadPreferences() {
 %hook SBLockScreenManager
 
 - (void)_bioAuthenticated:(id)arg1 {
-	if (lockView && self.isUILocked && enabled) {
+	if (lockView && self.isUILocked && enabled && !shouldNotDelay) {
 		authenticated = YES;
 		[lockView performSelectorOnMainThread:@selector(performTickAnimation) withObject:nil waitUntilDone:YES];
 		double delayInSeconds = 1.3;
@@ -139,14 +144,14 @@ static void loadPreferences() {
 		}
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
 		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ 
-			//AudioServicesDisposeSystemSoundID(unlockSound);
 			if (!useTickAnimation && useUnlockSound) {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
 			fingerglyph.delegate = nil;
+			[lockView performSelectorOnMainThread:@selector(resetFingerScanAnimation) withObject:nil waitUntilDone:YES];
+			shouldNotDelay = NO;
 			usingGlyph = NO;
 			lockView = nil;
-			//[fingerglyph removeFromSuperview];
 			fingerglyph = nil;
 			%orig; });
 	} else {
@@ -165,18 +170,17 @@ static void loadPreferences() {
 			case TouchIDFingerUp:
 				[lockView performSelectorOnMainThread:@selector(resetFingerScanAnimation) withObject:nil waitUntilDone:YES];
 				break;
+			case TouchIDNotMatched:
+			if (shakeOnIncorrectFinger) {
+				[lockView performSelectorOnMainThread:@selector(performShakeFingerFailAnimation) withObject:nil waitUntilDone:YES];
+			}
+			if (vibrateOnIncorrectFinger) {
+				AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
+			}
+				break;
 		}
 	}
 }
-
-/*- (void)_finishUIUnlockFromSource:(int)arg1 withOptions:(id)arg2 {
-	%orig;
-	fingerAlreadyFailed = NO;
-	usingGlyph = NO;
-	lockView = nil;
-	[fingerglyph removeFromSuperview];
-	fingerglyph = nil;
-}*/
 
 %end
 
@@ -202,6 +206,14 @@ static void loadPreferences() {
 		fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
 	}
 }
+
+/*- (void)_removePasscodeOverlayWithCompletion:(CDUnknownBlockType)arg1 {
+	shouldNotDelay = 
+}
+
+- (void)_addPasscodeOverlayWithCompletion:(CDUnknownBlockType)arg1 {
+
+}*/
 
 %end
 
