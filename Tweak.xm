@@ -53,6 +53,10 @@ static void loadPreferences() {
  	secondaryColor = !CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultSecondaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
 }
 
+@interface SBLockScreenScrollView : UIScrollView
+-(void)addShineAnimationToView:(UIView*)aView;
+@end
+
 %hook SBLockScreenScrollView
 
 -(void)didMoveToWindow {
@@ -67,6 +71,7 @@ static void loadPreferences() {
 		fingerglyph.userInteractionEnabled = NO;
 		CGRect screen = [[UIScreen mainScreen] bounds];
 		fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+		[self addShineAnimationToView:fingerglyph];
 		[self addSubview:fingerglyph];
 	}
 }
@@ -90,6 +95,47 @@ static void loadPreferences() {
 	[shakeanimation setFromValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x - 10, fingerglyph.center.y)]];
 	[shakeanimation setToValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x + 10, fingerglyph.center.y)]];
 	[[fingerglyph layer] addAnimation:shakeanimation forKey:@"position"];
+}
+
+%new
+-(void)addShineAnimationToView:(UIView*)aView
+{
+    CAGradientLayer *gradient = [CAGradientLayer layer];
+    [gradient setStartPoint:CGPointMake(0, 0)];
+    [gradient setEndPoint:CGPointMake(1, 0)];
+    gradient.frame = CGRectMake(0, 0, aView.bounds.size.width*3, aView.bounds.size.height);
+    float lowerAlpha = 0.78;
+    gradient.colors = [NSArray arrayWithObjects:
+                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+                       (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
+                       (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
+                       (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
+                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+                       nil];
+    gradient.locations = [NSArray arrayWithObjects:
+                          [NSNumber numberWithFloat:0.0],
+                          [NSNumber numberWithFloat:0.4],
+                          [NSNumber numberWithFloat:0.45],
+                          [NSNumber numberWithFloat:0.5],
+                          [NSNumber numberWithFloat:0.55],
+                          [NSNumber numberWithFloat:0.6],
+                          [NSNumber numberWithFloat:1.0],
+                          nil];
+
+    CABasicAnimation *theAnimation;
+    theAnimation=[CABasicAnimation animationWithKeyPath:@"transform.translation.x"];
+    theAnimation.duration = 2;
+    theAnimation.repeatCount = INFINITY;
+    theAnimation.autoreverses = NO;
+    theAnimation.removedOnCompletion = NO;
+    theAnimation.fillMode = kCAFillModeForwards;
+    theAnimation.fromValue=[NSNumber numberWithFloat:-aView.frame.size.width*2];
+    theAnimation.toValue=[NSNumber numberWithFloat:0];
+    [gradient addAnimation:theAnimation forKey:@"animateLayer"];
+
+    aView.layer.mask = gradient;
 }
 
 %new(v@:)
