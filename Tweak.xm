@@ -70,7 +70,11 @@ static void loadPreferences() {
 		fingerglyph.primaryColor = primaryColor;
 		fingerglyph.userInteractionEnabled = NO;
 		CGRect screen = [[UIScreen mainScreen] bounds];
-		fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+		if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
+			fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
+		} else {
+			fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+		}
 		[self addShineAnimationToView:fingerglyph];
 		[self addSubview:fingerglyph];
 	}
