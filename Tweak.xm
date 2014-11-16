@@ -6,7 +6,7 @@
 #define TouchIDFingerUp    0
 #define TouchIDFingerDown  1
 #define TouchIDFingerHeld  2
-#define TouchIDMatched     3	
+#define TouchIDMatched     3
 #define TouchIDNotMatched  9
 
 #define kDefaultPrimaryColor [[UIColor alloc] initWithRed:188/255.0f green:188/255.0f blue:188/255.0f alpha:1.0f]
@@ -224,14 +224,23 @@ static void loadPreferences() {
 			case TouchIDFingerUp:
 				[lockView performSelectorOnMainThread:@selector(resetFingerScanAnimation) withObject:nil waitUntilDone:YES];
 				break;
-			case TouchIDNotMatched:
-			if (shakeOnIncorrectFinger) {
-				[lockView performSelectorOnMainThread:@selector(performShakeFingerFailAnimation) withObject:nil waitUntilDone:YES];
-			}
-			if (vibrateOnIncorrectFinger) {
-				AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
-			}
-				break;
+		}
+	}
+}
+
+%end
+
+%hook SBBiometricEventLogger
+
+- (void)_tryAgain:(id)arg1 {
+	%orig;
+	SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
+	if (lockView && manager.isUILocked && enabled && !authenticated) {
+		if (shakeOnIncorrectFinger) {
+			[lockView performSelectorOnMainThread:@selector(performShakeFingerFailAnimation) withObject:nil waitUntilDone:YES];
+		}
+		if (vibrateOnIncorrectFinger) {
+			AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 		}
 	}
 }
