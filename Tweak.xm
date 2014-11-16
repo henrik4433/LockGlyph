@@ -3,11 +3,11 @@
 #import "PKGlyphView.h"
 #import "SBLockScreenManager.h"
 
-#define TouchIDFingerDown  1
 #define TouchIDFingerUp    0
+#define TouchIDFingerDown  1
 #define TouchIDFingerHeld  2
-#define TouchIDMatched     3
-#define TouchIDNotMatched  10
+#define TouchIDMatched     3	
+#define TouchIDNotMatched  9
 
 #define kDefaultPrimaryColor [[UIColor alloc] initWithRed:188/255.0f green:188/255.0f blue:188/255.0f alpha:1.0f]
 #define kDefaultSecondaryColor [[UIColor alloc] initWithRed:119/255.0f green:119/255.0f blue:119/255.0f alpha:1.0f]
