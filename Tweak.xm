@@ -183,7 +183,7 @@ static void loadPreferences() {
 %hook SBLockScreenManager
 
 - (void)_bioAuthenticated:(id)arg1 {
-	if (lockView && self.isUILocked && enabled && !shouldNotDelay) {
+	if (lockView && self.isUILocked && enabled && !shouldNotDelay && !self.bioAuthenticatedWhileMenuButtonDown && ![[self lockScreenViewController] isPasscodeLockVisible]) {
 		authenticated = YES;
 		[lockView performSelectorOnMainThread:@selector(performTickAnimation) withObject:nil waitUntilDone:YES];
 		double delayInSeconds = 1.3;
@@ -270,13 +270,24 @@ static void loadPreferences() {
 	}
 }
 
-/*- (void)_removePasscodeOverlayWithCompletion:(CDUnknownBlockType)arg1 {
-	shouldNotDelay = 
+%end
+
+%hook SBLockScreenPasscodeOverlayViewController
+
+- (void)viewWillAppear:(_Bool)arg1 {
+	%orig;
+	fingerglyph.hidden = YES;
 }
 
-- (void)_addPasscodeOverlayWithCompletion:(CDUnknownBlockType)arg1 {
+- (void)passcodeLockViewPasscodeEnteredViaMesa:(id)arg1 {
+	%orig;
+	fingerglyph.hidden = NO;
+}
 
-}*/
+- (void)passcodeLockViewPasscodeEntered:(id)arg1 {
+	%orig;
+	fingerglyph.hidden = NO;
+}
 
 %end
 
