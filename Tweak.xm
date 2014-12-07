@@ -29,6 +29,8 @@ BOOL shakeOnIncorrectFinger;
 BOOL useShine;
 UIColor *primaryColor;
 UIColor *secondaryColor;
+CGFloat portraitY;
+CGFloat landscapeY;
 
 static UIColor* parseColorFromPreferences(NSString* string) {
 	NSArray *prefsarray = [string componentsSeparatedByString: @":"];
@@ -53,6 +55,8 @@ static void loadPreferences() {
  	useShine = !CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
 	primaryColor = !CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultPrimaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
  	secondaryColor = !CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultSecondaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
+ 	portraitY = !CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
+ 	landscapeY = !CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
 }
 
 @interface SBLockScreenScrollView : UIScrollView
@@ -73,9 +77,15 @@ static void loadPreferences() {
 		fingerglyph.userInteractionEnabled = NO;
 		CGRect screen = [[UIScreen mainScreen] bounds];
 		if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
-			fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
+			if (landscapeY == 0)
+				fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
+			else
+				fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),landscapeY);
 		} else {
-			fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+			if (portraitY == 0)
+				fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+			else
+				fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),portraitY);
 		}
 		if (useShine) {
 			[self addShineAnimationToView:fingerglyph];
@@ -105,6 +115,10 @@ static void loadPreferences() {
 	[[fingerglyph layer] addAnimation:shakeanimation forKey:@"position"];
 }
 
+/* Not my method, taken from this Stack Overflow
+answer:
+http://stackoverflow.com/a/26081621
+*/
 %new
 -(void)addShineAnimationToView:(UIView*)aView
 {
@@ -264,10 +278,21 @@ static void loadPreferences() {
 	%orig;
 	CGRect screen = [[UIScreen mainScreen] bounds];
 	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-		fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
+		if (landscapeY == 0)
+			fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
+		else
+			fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),landscapeY);
 	} else {
-		fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+		if (portraitY == 0)
+			fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
+		else
+			fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),portraitY);
 	}
+}
+
+%new
++(PKGlyphView *)getLockGlyphView {
+	return fingerglyph;
 }
 
 %end
