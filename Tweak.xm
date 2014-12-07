@@ -59,6 +59,33 @@ static void loadPreferences() {
  	landscapeY = !CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
 }
 
+static void performFingerScanAnimation(void) {
+	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)])
+		[fingerglyph setState:1 animated:YES completionHandler:nil];
+}
+
+static void resetFingerScanAnimation(void) {
+	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)])
+		[fingerglyph setState:0 animated:YES completionHandler:nil];
+}
+
+static void performTickAnimation(void) {
+	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)])
+		[fingerglyph setState:6 animated:YES completionHandler:nil];
+}
+
+static void performShakeFingerFailAnimation(void) {
+	if (fingerglyph) {
+		CABasicAnimation *shakeanimation = [CABasicAnimation animationWithKeyPath:@"position"];
+		[shakeanimation setDuration:0.05];
+		[shakeanimation setRepeatCount:4];
+		[shakeanimation setAutoreverses:YES];
+		[shakeanimation setFromValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x - 10, fingerglyph.center.y)]];
+		[shakeanimation setToValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x + 10, fingerglyph.center.y)]];
+		[[fingerglyph layer] addAnimation:shakeanimation forKey:@"position"];
+	}
+}
+
 @interface SBLockScreenScrollView : UIScrollView
 -(void)addShineAnimationToView:(UIView*)aView;
 @end
@@ -199,7 +226,7 @@ http://stackoverflow.com/a/26081621
 - (void)_bioAuthenticated:(id)arg1 {
 	if (lockView && self.isUILocked && enabled && !shouldNotDelay && !self.bioAuthenticatedWhileMenuButtonDown && ![[self lockScreenViewController] isPasscodeLockVisible]) {
 		authenticated = YES;
-		[lockView performSelectorOnMainThread:@selector(performTickAnimation) withObject:nil waitUntilDone:YES];
+		performTickAnimation();
 		double delayInSeconds = 1.3;
 		if (!useTickAnimation) {
 			delayInSeconds = 0.3;
@@ -216,7 +243,7 @@ http://stackoverflow.com/a/26081621
 				AudioServicesPlaySystemSound(unlockSound);
 			}
 			fingerglyph.delegate = nil;
-			[lockView performSelectorOnMainThread:@selector(resetFingerScanAnimation) withObject:nil waitUntilDone:YES];
+			resetFingerScanAnimation();
 			shouldNotDelay = NO;
 			usingGlyph = NO;
 			lockView = nil;
@@ -233,10 +260,10 @@ http://stackoverflow.com/a/26081621
 	if (lockView && self.isUILocked && enabled && !authenticated) {
 		switch (arg2) {
 			case TouchIDFingerDown:
-				[lockView performSelectorOnMainThread:@selector(performFingerScanAnimation) withObject:nil waitUntilDone:YES];
+				performFingerScanAnimation();
 				break;
 			case TouchIDFingerUp:
-				[lockView performSelectorOnMainThread:@selector(resetFingerScanAnimation) withObject:nil waitUntilDone:YES];
+				resetFingerScanAnimation();
 				break;
 		}
 	}
@@ -251,7 +278,7 @@ http://stackoverflow.com/a/26081621
 	SBLockScreenManager *manager = [%c(SBLockScreenManager) sharedInstance];
 	if (lockView && manager.isUILocked && enabled && !authenticated) {
 		if (shakeOnIncorrectFinger) {
-			[lockView performSelectorOnMainThread:@selector(performShakeFingerFailAnimation) withObject:nil waitUntilDone:YES];
+			performShakeFingerFailAnimation();
 		}
 		if (vibrateOnIncorrectFinger) {
 			AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
