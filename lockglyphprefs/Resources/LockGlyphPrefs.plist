@@ -197,6 +197,20 @@
 			<string>Fingerprint Position</string>
 		</dict>
 		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>enablePortraitY</string>
+			<key>label</key>
+			<string>Custom Portrait Y</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+		<dict>
             <key>cell</key>
             <string>PSEditTextCell</string>
             <key>label</key>
@@ -210,6 +224,20 @@
             <key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
         </dict>
+        <dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>enableLandscapeY</string>
+			<key>label</key>
+			<string>Custom Landscape Y</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
         <dict>
             <key>cell</key>
             <string>PSEditTextCell</string>

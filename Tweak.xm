@@ -29,7 +29,9 @@ BOOL shakeOnIncorrectFinger;
 BOOL useShine;
 UIColor *primaryColor;
 UIColor *secondaryColor;
+BOOL enablePortraitY;
 CGFloat portraitY;
+BOOL enableLandscapeY;
 CGFloat landscapeY;
 
 static UIColor* parseColorFromPreferences(NSString* string) {
@@ -55,7 +57,9 @@ static void loadPreferences() {
  	useShine = !CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
 	primaryColor = !CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultPrimaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
  	secondaryColor = !CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultSecondaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
+ 	enablePortraitY = !CFPreferencesCopyAppValue(CFSTR("enablePortraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("enablePortraitY"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	portraitY = !CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
+ 	enableLandscapeY = !CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	landscapeY = !CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
 }
 
@@ -104,12 +108,12 @@ static void performShakeFingerFailAnimation(void) {
 		fingerglyph.userInteractionEnabled = NO;
 		CGRect screen = [[UIScreen mainScreen] bounds];
 		if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
-			if (landscapeY == 0)
+			if (landscapeY == 0 || !enableLandscapeY)
 				fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
 			else
 				fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),landscapeY);
 		} else {
-			if (portraitY == 0)
+			if (portraitY == 0 || !enablePortraitY)
 				fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
 			else
 				fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),portraitY);
@@ -305,12 +309,12 @@ http://stackoverflow.com/a/26081621
 	%orig;
 	CGRect screen = [[UIScreen mainScreen] bounds];
 	if (UIInterfaceOrientationIsLandscape(toInterfaceOrientation)) {
-		if (landscapeY == 0)
+		if (landscapeY == 0 || !enableLandscapeY)
 			fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),screen.size.width-60);
 		else
 			fingerglyph.center = CGPointMake(screen.size.height+CGRectGetMidY(screen),landscapeY);
 	} else {
-		if (portraitY == 0)
+		if (portraitY == 0 || !enablePortraitY)
 			fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),screen.size.height-60);
 		else
 			fingerglyph.center = CGPointMake(screen.size.width+CGRectGetMidX(screen),portraitY);
