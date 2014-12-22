@@ -130,7 +130,7 @@
             <key>cellClass</key>
             <string>PFColorCell</string>
             <key>label</key>
-            <string>Scanning color</string>
+            <string>Scanning colour</string>
             <key>color_defaults</key>
             <string>com.evilgoldfish.lockglyph</string>
             <key>color_key</key>
