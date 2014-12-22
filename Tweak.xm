@@ -101,7 +101,7 @@ static void performShakeFingerFailAnimation(void) {
 		lockView = (UIView *)self;
 		usingGlyph = YES;
 		authenticated = NO;
-		fingerglyph = [[%c(PKGlyphView) alloc] initWithStyle:1];
+		fingerglyph = [[%c(PKGlyphView) alloc] initWithStyle:0];
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
 		fingerglyph.secondaryColor = secondaryColor;
 		fingerglyph.primaryColor = primaryColor;
