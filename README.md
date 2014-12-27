@@ -12,7 +12,7 @@ secondaryColor 119 119 119
 2 - Loading circle  
 3 - Empty circle  
 4 - Move iphone to reader animation  
-5 - Empty circle  
+5 - Custom image state
 6 - The successful payment tick  
 
 ### The PKGlyphView styles:  

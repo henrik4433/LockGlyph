@@ -3,6 +3,8 @@
 #import "PKGlyphView.h"
 #import "SBLockScreenManager.h"
 
+#define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
+
 #define TouchIDFingerUp    0
 #define TouchIDFingerDown  1
 #define TouchIDFingerHeld  2
@@ -19,6 +21,7 @@ SystemSoundID unlockSound;
 BOOL authenticated;
 BOOL shouldNotDelay;
 BOOL usingGlyph;
+NSBundle *themeAssets;
 
 BOOL enabled;
 BOOL useUnlockSound;
@@ -33,6 +36,7 @@ BOOL enablePortraitY;
 CGFloat portraitY;
 BOOL enableLandscapeY;
 CGFloat landscapeY;
+NSString *themeBundleName;
 
 static UIColor* parseColorFromPreferences(NSString* string) {
 	NSArray *prefsarray = [string componentsSeparatedByString: @":"];
@@ -61,6 +65,19 @@ static void loadPreferences() {
  	portraitY = !CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
  	enableLandscapeY = !CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
  	landscapeY = !CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
+ 	themeBundleName = !CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph")) ? @"LockGlyph-Default.bundle" : (id)CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph"));
+
+ 	themeAssets = [[NSBundle alloc] initWithPath:[kBundlePath stringByAppendingString:themeBundleName]];
+
+ 	if (unlockSound)
+		AudioServicesDisposeSystemSoundID(unlockSound);
+
+	if ([themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]) {
+ 		NSURL *pathURL = [NSURL fileURLWithPath:[themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]];
+		AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
+	} else {
+		unlockSound = nil;
+	}
 }
 
 static void performFingerScanAnimation(void) {
@@ -69,8 +86,12 @@ static void performFingerScanAnimation(void) {
 }
 
 static void resetFingerScanAnimation(void) {
-	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)])
-		[fingerglyph setState:0 animated:YES completionHandler:nil];
+	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)]){
+		if (fingerglyph.customImage)
+			[fingerglyph setState:5 animated:YES completionHandler:nil];
+		else
+			[fingerglyph setState:0 animated:YES completionHandler:nil];
+	}
 }
 
 static void performTickAnimation(void) {
@@ -106,6 +127,12 @@ static void performShakeFingerFailAnimation(void) {
 		fingerglyph.secondaryColor = secondaryColor;
 		fingerglyph.primaryColor = primaryColor;
 		fingerglyph.userInteractionEnabled = NO;
+		if (themeAssets && [UIImage imageNamed:@"IdleImage.png" inBundle:themeAssets compatibleWithTraitCollection:nil]) {
+			UIImage *customImage = [UIImage imageNamed:@"IdleImage.png" inBundle:themeAssets compatibleWithTraitCollection:nil];
+			fingerglyph.customImage = [UIImage imageWithCGImage:customImage.CGImage scale:[UIScreen mainScreen].scale orientation:customImage.imageOrientation];
+			[fingerglyph setState:5 animated:YES completionHandler:nil];
+		}
+
 		CGRect screen = [[UIScreen mainScreen] bounds];
 		if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
 			if (landscapeY == 0 || !enableLandscapeY)
@@ -198,7 +225,7 @@ http://stackoverflow.com/a/26081621
 
 %new(v@:@c)
 - (void)glyphView:(PKGlyphView *)arg1 revealingCheckmark:(BOOL)arg2 {
-	if (useUnlockSound && useTickAnimation) {
+	if (useUnlockSound && useTickAnimation && unlockSound) {
 		AudioServicesPlaySystemSound(unlockSound);
 	}
 }
@@ -243,7 +270,7 @@ http://stackoverflow.com/a/26081621
 		}
 		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
 		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ 
-			if (!useTickAnimation && useUnlockSound) {
+			if (!useTickAnimation && useUnlockSound && unlockSound) {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
 			fingerglyph.delegate = nil;
@@ -356,7 +383,5 @@ http://stackoverflow.com/a/26081621
                                     NULL,
                                     CFNotificationSuspensionBehaviorCoalesce);
 	loadPreferences();
-	NSURL *pathURL = [NSURL fileURLWithPath: @"/System/Library/Frameworks/PassKit.framework/Payment_Success.wav"];
-	AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
 	[pool release];
 }
