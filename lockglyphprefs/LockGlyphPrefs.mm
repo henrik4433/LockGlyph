@@ -5,6 +5,7 @@
 #define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
 
 #define kResetColorsAlertTag 1
+#define kApplyThemeAlertTag 2
 
 @protocol PreferencesTableCustomView
 - (id)initWithSpecifier:(id)arg1;
@@ -60,6 +61,17 @@
 	[alert release];
 }
 
+-(void)respring {
+	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Apply Theme"
+                                                    message:@"Are you sure you want to apply a theme?\n\nThis will make your device respring."
+                                                   delegate:self
+                                          cancelButtonTitle:@"No"
+                                          otherButtonTitles:@"Yes", nil];
+    alert.tag = kApplyThemeAlertTag;
+    [alert show];
+    [alert release];
+}
+
 - (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) { // Tapped yes
     	if (alertView.tag == kResetColorsAlertTag) {
@@ -73,6 +85,8 @@
     			NULL,
     			YES
     			);
+    	} else if (alertView.tag == kApplyThemeAlertTag) {
+    		system("killall -9 backboardd");
     	}
     }
 }

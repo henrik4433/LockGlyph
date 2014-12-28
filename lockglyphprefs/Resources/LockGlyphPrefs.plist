@@ -124,6 +124,16 @@
 		</dict>
 		<dict>
             <key>cell</key>
+            <string>PSButtonCell</string>
+            <key>id</key>
+			<string>applyThemeButton</string>
+            <key>action</key>
+            <string>respring</string>
+            <key>label</key>
+            <string>Apply theme</string>
+        </dict>
+		<dict>
+            <key>cell</key>
             <string>PSLinkCell</string>
             <key>cellClass</key>
             <string>PFColorCell</string>
