@@ -131,6 +131,9 @@ static void performShakeFingerFailAnimation(void) {
 			UIImage *customImage = [UIImage imageNamed:@"IdleImage.png" inBundle:themeAssets compatibleWithTraitCollection:nil];
 			fingerglyph.customImage = [UIImage imageWithCGImage:customImage.CGImage scale:[UIScreen mainScreen].scale orientation:customImage.imageOrientation];
 			[fingerglyph setState:5 animated:YES completionHandler:nil];
+		} else {
+			fingerglyph.customImage = nil;
+			[fingerglyph setState:0 animated:YES completionHandler:nil];
 		}
 
 		CGRect screen = [[UIScreen mainScreen] bounds];
