@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>items</key>
+	<array>
+		<dict>
+			<key>cell</key>
+			<string>PSGroupCell</string>
+			<key>label</key>
+			<string>Animations</string>
+			<key>footerText</key>
+			<string>Use faster animations will make LockGlyph animate much faster.</string>
+			<key>footerAlignment</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>useTickAnimation</string>
+			<key>label</key>
+			<string>Use tick animation</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<true/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>useShine</string>
+			<key>label</key>
+			<string>Use shine animation</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>useFasterAnimations</string>
+			<key>label</key>
+			<string>Use faster animations</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+	</array>
+	<key>title</key>
+	<string>Animations</string>
+</dict>
+</plist>
