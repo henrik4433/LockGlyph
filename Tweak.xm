@@ -117,8 +117,49 @@ static void performShakeFingerFailAnimation(void) {
 
 %hook SBLockScreenScrollView
 
+%new
+- (void)LG_RevertUI:(NSNotification *)notification {
+  if (enabled && usingGlyph && fingerglyph) {
+    fingerglyph.secondaryColor = secondaryColor;
+    fingerglyph.primaryColor = primaryColor;
+  }
+}
+ 
+ %new
+- (void)LG_ColorizeUI:(NSNotification *)notification {
+    NSDictionary *userInfo = [notification userInfo];
+    UIColor *primaryColor = userInfo[@"PrimaryColor"];
+    UIColor *secondaryColor = userInfo[@"SecondaryColor"];
+    if (enabled && usingGlyph && fingerglyph) {
+      fingerglyph.primaryColor = primaryColor;
+      fingerglyph.secondaryColor = secondaryColor;
+    }
+}
+
+- (void)dealloc {
+  NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
+  NSString *color = @"ColorFlowLockScreenColorizationNotification";
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
+  [[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+  %orig;
+}
+
 -(void)didMoveToWindow {
 	if (enabled) {
+    // So we don't receive multiple notifications from over registering.
+    NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
+    NSString *color = @"ColorFlowLockScreenColorizationNotification";
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
+    [[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                         selector:@selector(LG_RevertUI:)
+                                             name:revert
+                                           object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(LG_ColorizeUI:)
+                                                 name:color
+                                               object:nil];
+
 		lockView = (UIView *)self;
 		usingGlyph = YES;
 		authenticated = NO;
