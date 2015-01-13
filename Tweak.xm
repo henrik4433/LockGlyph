@@ -2,13 +2,14 @@
 #import <AudioToolbox/AudioServices.h>
 #import "PKGlyphView.h"
 #import "SBLockScreenManager.h"
+#import "NSTimer+Blocks.h"
 
 #define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
 
-#define TouchIDFingerUp    0
+#define TouchIDFingerUp	0
 #define TouchIDFingerDown  1
 #define TouchIDFingerHeld  2
-#define TouchIDMatched     3
+#define TouchIDMatched	 3
 #define TouchIDNotMatched  9
 
 #define kDefaultPrimaryColor [[UIColor alloc] initWithRed:188/255.0f green:188/255.0f blue:188/255.0f alpha:1.0f]
@@ -17,9 +18,9 @@
 UIView *lockView = nil;
 PKGlyphView *fingerglyph = nil;
 SystemSoundID unlockSound;
+NSTimer *unlockTimer;
 
 BOOL authenticated;
-BOOL shouldNotDelay;
 BOOL usingGlyph;
 NSBundle *themeAssets;
 
@@ -37,6 +38,7 @@ CGFloat portraitY;
 BOOL enableLandscapeY;
 CGFloat landscapeY;
 NSString *themeBundleName;
+BOOL shouldNotDelay;
 
 static UIColor* parseColorFromPreferences(NSString* string) {
 	NSArray *prefsarray = [string componentsSeparatedByString: @":"];
@@ -44,36 +46,37 @@ static UIColor* parseColorFromPreferences(NSString* string) {
 	double alpha = [[prefsarray objectAtIndex:1] doubleValue];
 
 	unsigned rgbValue = 0;
-    NSScanner *scanner = [NSScanner scannerWithString:hexString];
-    [scanner setScanLocation:1]; // bypass '#' character
-    [scanner scanHexInt:&rgbValue];
-    return [[UIColor alloc] initWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:alpha];
+	NSScanner *scanner = [NSScanner scannerWithString:hexString];
+	[scanner setScanLocation:1]; // bypass '#' character
+	[scanner scanHexInt:&rgbValue];
+	return [[UIColor alloc] initWithRed:((rgbValue & 0xFF0000) >> 16)/255.0 green:((rgbValue & 0xFF00) >> 8)/255.0 blue:(rgbValue & 0xFF)/255.0 alpha:alpha];
 }
 
 static void loadPreferences() {
-    CFPreferencesAppSynchronize(CFSTR("com.evilgoldfish.lockglyph"));
-    enabled = !CFPreferencesCopyAppValue(CFSTR("enabled"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("enabled"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	useUnlockSound = !CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	useTickAnimation = !CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	useFasterAnimations = !CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	CFPreferencesAppSynchronize(CFSTR("com.evilgoldfish.lockglyph"));
+	enabled = !CFPreferencesCopyAppValue(CFSTR("enabled"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("enabled"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	useUnlockSound = !CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useUnlockSound"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	useTickAnimation = !CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useTickAnimation"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	useFasterAnimations = !CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("useFasterAnimations"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
 	vibrateOnIncorrectFinger = !CFPreferencesCopyAppValue(CFSTR("vibrateOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("vibrateOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	shakeOnIncorrectFinger = !CFPreferencesCopyAppValue(CFSTR("shakeOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("shakeOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	useShine = !CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	shakeOnIncorrectFinger = !CFPreferencesCopyAppValue(CFSTR("shakeOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("shakeOnIncorrectFinger"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	useShine = !CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) ? YES : [(id)CFPreferencesCopyAppValue(CFSTR("useShine"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
 	primaryColor = !CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultPrimaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("primaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
- 	secondaryColor = !CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultSecondaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
- 	enablePortraitY = !CFPreferencesCopyAppValue(CFSTR("enablePortraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("enablePortraitY"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	portraitY = !CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
- 	enableLandscapeY = !CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
- 	landscapeY = !CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
- 	themeBundleName = !CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph")) ? @"LockGlyph-Default.bundle" : (id)CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph"));
+	secondaryColor = !CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")) ? kDefaultSecondaryColor : parseColorFromPreferences((id)CFPreferencesCopyAppValue(CFSTR("secondaryColor"), CFSTR("com.evilgoldfish.lockglyph")));
+	enablePortraitY = !CFPreferencesCopyAppValue(CFSTR("enablePortraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("enablePortraitY"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	portraitY = !CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("portraitY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
+	enableLandscapeY = !CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("enableLandscapeY"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
+	landscapeY = !CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) ? 0 : [(id)CFPreferencesCopyAppValue(CFSTR("landscapeY"), CFSTR("com.evilgoldfish.lockglyph")) floatValue];
+	themeBundleName = !CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph")) ? @"LockGlyph-Default.bundle" : (id)CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph"));
+	shouldNotDelay = !CFPreferencesCopyAppValue(CFSTR("shouldNotDelay"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(id)CFPreferencesCopyAppValue(CFSTR("shouldNotDelay"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
 
- 	themeAssets = [[NSBundle alloc] initWithPath:[kBundlePath stringByAppendingString:themeBundleName]];
+	themeAssets = [[NSBundle alloc] initWithPath:[kBundlePath stringByAppendingString:themeBundleName]];
 
- 	if (unlockSound)
+	if (unlockSound)
 		AudioServicesDisposeSystemSoundID(unlockSound);
 
 	if ([themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]) {
- 		NSURL *pathURL = [NSURL fileURLWithPath:[themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]];
+		NSURL *pathURL = [NSURL fileURLWithPath:[themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]];
 		AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
 	} else {
 		unlockSound = nil;
@@ -120,20 +123,20 @@ static void performShakeFingerFailAnimation(void) {
 %new
 - (void)LG_RevertUI:(NSNotification *)notification {
   if (enabled && usingGlyph && fingerglyph) {
-    fingerglyph.secondaryColor = secondaryColor;
-    fingerglyph.primaryColor = primaryColor;
+	fingerglyph.secondaryColor = secondaryColor;
+	fingerglyph.primaryColor = primaryColor;
   }
 }
  
  %new
 - (void)LG_ColorizeUI:(NSNotification *)notification {
-    NSDictionary *userInfo = [notification userInfo];
-    UIColor *primaryColor = userInfo[@"PrimaryColor"];
-    UIColor *secondaryColor = userInfo[@"SecondaryColor"];
-    if (enabled && usingGlyph && fingerglyph) {
-      fingerglyph.primaryColor = primaryColor;
-      fingerglyph.secondaryColor = secondaryColor;
-    }
+	NSDictionary *userInfo = [notification userInfo];
+	UIColor *primaryColor = userInfo[@"PrimaryColor"];
+	UIColor *secondaryColor = userInfo[@"SecondaryColor"];
+	if (enabled && usingGlyph && fingerglyph) {
+	  fingerglyph.primaryColor = primaryColor;
+	  fingerglyph.secondaryColor = secondaryColor;
+	}
 }
 
 - (void)dealloc {
@@ -146,19 +149,19 @@ static void performShakeFingerFailAnimation(void) {
 
 -(void)didMoveToWindow {
 	if (enabled) {
-    // So we don't receive multiple notifications from over registering.
-    NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
-    NSString *color = @"ColorFlowLockScreenColorizationNotification";
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
-    [[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                         selector:@selector(LG_RevertUI:)
-                                             name:revert
-                                           object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self
-                                             selector:@selector(LG_ColorizeUI:)
-                                                 name:color
-                                               object:nil];
+	// So we don't receive multiple notifications from over registering.
+	NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
+	NSString *color = @"ColorFlowLockScreenColorizationNotification";
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+										 selector:@selector(LG_RevertUI:)
+											 name:revert
+										   object:nil];
+	[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(LG_ColorizeUI:)
+												 name:color
+											   object:nil];
 
 		lockView = (UIView *)self;
 		usingGlyph = YES;
@@ -221,42 +224,42 @@ http://stackoverflow.com/a/26081621
 %new
 -(void)addShineAnimationToView:(UIView*)aView
 {
-    CAGradientLayer *gradient = [CAGradientLayer layer];
-    [gradient setStartPoint:CGPointMake(0, 0)];
-    [gradient setEndPoint:CGPointMake(1, 0)];
-    gradient.frame = CGRectMake(0, 0, aView.bounds.size.width*3, aView.bounds.size.height);
-    float lowerAlpha = 0.78;
-    gradient.colors = [NSArray arrayWithObjects:
-                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
-                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
-                       (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
-                       (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
-                       (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
-                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
-                       (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
-                       nil];
-    gradient.locations = [NSArray arrayWithObjects:
-                          [NSNumber numberWithFloat:0.0],
-                          [NSNumber numberWithFloat:0.4],
-                          [NSNumber numberWithFloat:0.45],
-                          [NSNumber numberWithFloat:0.5],
-                          [NSNumber numberWithFloat:0.55],
-                          [NSNumber numberWithFloat:0.6],
-                          [NSNumber numberWithFloat:1.0],
-                          nil];
+	CAGradientLayer *gradient = [CAGradientLayer layer];
+	[gradient setStartPoint:CGPointMake(0, 0)];
+	[gradient setEndPoint:CGPointMake(1, 0)];
+	gradient.frame = CGRectMake(0, 0, aView.bounds.size.width*3, aView.bounds.size.height);
+	float lowerAlpha = 0.78;
+	gradient.colors = [NSArray arrayWithObjects:
+					   (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+					   (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+					   (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
+					   (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
+					   (id)[[UIColor colorWithWhite:1 alpha:1.0] CGColor],
+					   (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+					   (id)[[UIColor colorWithWhite:1 alpha:lowerAlpha] CGColor],
+					   nil];
+	gradient.locations = [NSArray arrayWithObjects:
+						  [NSNumber numberWithFloat:0.0],
+						  [NSNumber numberWithFloat:0.4],
+						  [NSNumber numberWithFloat:0.45],
+						  [NSNumber numberWithFloat:0.5],
+						  [NSNumber numberWithFloat:0.55],
+						  [NSNumber numberWithFloat:0.6],
+						  [NSNumber numberWithFloat:1.0],
+						  nil];
 
-    CABasicAnimation *theAnimation;
-    theAnimation=[CABasicAnimation animationWithKeyPath:@"transform.translation.x"];
-    theAnimation.duration = 2;
-    theAnimation.repeatCount = INFINITY;
-    theAnimation.autoreverses = NO;
-    theAnimation.removedOnCompletion = NO;
-    theAnimation.fillMode = kCAFillModeForwards;
-    theAnimation.fromValue=[NSNumber numberWithFloat:-aView.frame.size.width*2];
-    theAnimation.toValue=[NSNumber numberWithFloat:0];
-    [gradient addAnimation:theAnimation forKey:@"animateLayer"];
+	CABasicAnimation *theAnimation;
+	theAnimation=[CABasicAnimation animationWithKeyPath:@"transform.translation.x"];
+	theAnimation.duration = 2;
+	theAnimation.repeatCount = INFINITY;
+	theAnimation.autoreverses = NO;
+	theAnimation.removedOnCompletion = NO;
+	theAnimation.fillMode = kCAFillModeForwards;
+	theAnimation.fromValue=[NSNumber numberWithFloat:-aView.frame.size.width*2];
+	theAnimation.toValue=[NSNumber numberWithFloat:0];
+	[gradient addAnimation:theAnimation forKey:@"animateLayer"];
 
-    aView.layer.mask = gradient;
+	aView.layer.mask = gradient;
 }
 
 %new(v@:)
@@ -309,19 +312,22 @@ http://stackoverflow.com/a/26081621
 				delayInSeconds = 0.1;
 			}
 		}
-		dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC);
-		dispatch_after(popTime, dispatch_get_main_queue(), ^(void){ 
+		unlockTimer = [NSTimer scheduledTimerWithTimeInterval:delayInSeconds block:^{
 			if (!useTickAnimation && useUnlockSound && unlockSound) {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
 			fingerglyph.delegate = nil;
 			resetFingerScanAnimation();
-			shouldNotDelay = NO;
 			usingGlyph = NO;
 			lockView = nil;
 			fingerglyph = nil;
-			%orig; });
+			%orig;
+		} repeats:NO];
 	} else {
+		if (shouldNotDelay) {
+			authenticated = YES;
+			performTickAnimation();
+		}
 		%orig;
 	}
 }
@@ -415,14 +421,28 @@ http://stackoverflow.com/a/26081621
 
 %end
 
+%hook SBAssistantController
+
+-(void)_viewDidAppearOnMainScreen:(BOOL)_view {
+	// unlockTimer sometimes isn't an NSTimer. These lines crash SpringBoard (excluding the last 2) - investigate
+	if (unlockTimer && [unlockTimer isKindOfClass:[NSTimer class]]) {
+		[unlockTimer invalidate];
+		unlockTimer = nil;
+	}
+	[[%c(SBLockScreenManager) sharedInstance] _lockUI];
+	%orig;
+}
+
+%end
+
 %ctor {
 	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 	CFNotificationCenterAddObserver(CFNotificationCenterGetDarwinNotifyCenter(),
-                                    NULL,
-                                    (CFNotificationCallback)loadPreferences,
-                                    CFSTR("com.evilgoldfish.lockglyph.settingschanged"),
-                                    NULL,
-                                    CFNotificationSuspensionBehaviorCoalesce);
+									NULL,
+									(CFNotificationCallback)loadPreferences,
+									CFSTR("com.evilgoldfish.lockglyph.settingschanged"),
+									NULL,
+									CFNotificationSuspensionBehaviorCoalesce);
 	loadPreferences();
 	[pool release];
 }

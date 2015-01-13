@@ -9,6 +9,10 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>General</string>
+			<key>footerText</key>
+			<string>Enabling Unlock immediately will unlock the device as soon as a fingerprint is recognised. Enable this if you would like to unlock as fast as possible.</string>
+			<key>footerAlignment</key>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -35,6 +39,20 @@
 			<string>useUnlockSound</string>
 			<key>label</key>
 			<string>Enable unlock sound</string>
+			<key>PostNotification</key>
+			<string>com.evilgoldfish.lockglyph.settingschanged</string>
+		</dict>
+		<dict>
+			<key>cell</key>
+			<string>PSSwitchCell</string>
+			<key>default</key>
+			<false/>
+			<key>defaults</key>
+			<string>com.evilgoldfish.lockglyph</string>
+			<key>key</key>
+			<string>shouldNotDelay</string>
+			<key>label</key>
+			<string>Unlock immediately</string>
 			<key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
 		</dict>

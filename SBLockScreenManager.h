@@ -7,6 +7,8 @@
 - (void)unlockUIFromSource:(int)arg1 withOptions:(id)arg2;
 - (void)_finishUIUnlockFromSource:(int)arg1 withOptions:(id)arg2;
 - (void)_bioAuthenticated:(id)arg1;
+-(void)_lockUI;
+-(BOOL)attemptUnlockWithPasscode:(id)passcode;
 @property(nonatomic, getter=isUIUnlocking) _Bool UIUnlocking;
 @property(readonly) _Bool isWaitingToLockUI;
 @property(readonly) _Bool isUILocked;
