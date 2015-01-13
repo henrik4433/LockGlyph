@@ -10,7 +10,7 @@
 			<key>label</key>
 			<string>General</string>
 			<key>footerText</key>
-			<string>Enabling Unlock immediately will unlock the device as soon as a fingerprint is recognised. Enable this if you would like to unlock as fast as possible.</string>
+			<string>Enabling Unlock immediately will unlock the device as soon as a fingerprint is recognised or the fingerprint is tapped. Enable this if you would like to unlock as fast as possible.</string>
 			<key>footerAlignment</key>
 			<integer>1</integer>
 		</dict>

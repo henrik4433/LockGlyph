@@ -5,7 +5,7 @@ ARCHS = armv7 armv7s arm64
 TARGET = iphone:clang:latest:8.0
 
 TWEAK_NAME = LockGlyph
-LockGlyph_FILES = Tweak.xm NSTimer+Blocks.m
+LockGlyph_FILES = Tweak.xm
 LockGlyph_FRAMEWORKS = UIKit CoreGraphics AudioToolbox AVFoundation QuartzCore
 #SHARED_CFLAGS = -fobjc-arc
 #ADDITIONAL_OBJCFLAGS = -fobjc-arc

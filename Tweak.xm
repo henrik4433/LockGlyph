@@ -2,7 +2,6 @@
 #import <AudioToolbox/AudioServices.h>
 #import "PKGlyphView.h"
 #import "SBLockScreenManager.h"
-#import "NSTimer+Blocks.h"
 
 #define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
 
@@ -18,7 +17,6 @@
 UIView *lockView = nil;
 PKGlyphView *fingerglyph = nil;
 SystemSoundID unlockSound;
-NSTimer *unlockTimer;
 
 BOOL authenticated;
 BOOL usingGlyph;
@@ -121,6 +119,45 @@ static void performShakeFingerFailAnimation(void) {
 %hook SBLockScreenScrollView
 
 %new
+- (void)lockGlyphTapHandler:(UITapGestureRecognizer *)recognizer {
+	authenticated = YES;
+	performFingerScanAnimation();
+	fingerglyph.userInteractionEnabled = NO;
+	if (!shouldNotDelay) {
+		double delayInSeconds = 0.3;
+		if (useFasterAnimations) {
+			delayInSeconds = 0.1;
+		}
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){ 
+			if (useTickAnimation) {
+				performTickAnimation();
+
+				double delayInSeconds = 1.0;
+				if (useFasterAnimations) {
+					delayInSeconds = 0.4;
+				}
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){ 
+					if (!useTickAnimation && useUnlockSound && unlockSound) {
+						AudioServicesPlaySystemSound(unlockSound);
+					}
+					[[%c(SBLockScreenManager) sharedInstance] unlockUIFromSource:0 withOptions:nil];
+					resetFingerScanAnimation();
+					fingerglyph.userInteractionEnabled = YES;
+				});
+			} else {
+				[[%c(SBLockScreenManager) sharedInstance] unlockUIFromSource:0 withOptions:nil];
+				resetFingerScanAnimation();
+				fingerglyph.userInteractionEnabled = YES;
+			}
+		});
+	} else {
+		[[%c(SBLockScreenManager) sharedInstance] unlockUIFromSource:0 withOptions:nil];
+		resetFingerScanAnimation();
+		fingerglyph.userInteractionEnabled = YES;
+	}
+}
+
+%new
 - (void)LG_RevertUI:(NSNotification *)notification {
   if (enabled && usingGlyph && fingerglyph) {
 	fingerglyph.secondaryColor = secondaryColor;
@@ -170,12 +207,13 @@ static void performShakeFingerFailAnimation(void) {
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
 		fingerglyph.secondaryColor = secondaryColor;
 		fingerglyph.primaryColor = primaryColor;
-		fingerglyph.userInteractionEnabled = NO;
 		if (themeAssets && [UIImage imageNamed:@"IdleImage.png" inBundle:themeAssets compatibleWithTraitCollection:nil]) {
 			UIImage *customImage = [UIImage imageNamed:@"IdleImage.png" inBundle:themeAssets compatibleWithTraitCollection:nil];
 			fingerglyph.customImage = [UIImage imageWithCGImage:customImage.CGImage scale:[UIScreen mainScreen].scale orientation:customImage.imageOrientation];
 			[fingerglyph setState:5 animated:YES completionHandler:nil];
 		}
+		//UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(lockGlyphTapHandler:)];
+		//[fingerglyph addGestureRecognizer:tap];
 
 		CGRect screen = [[UIScreen mainScreen] bounds];
 		if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
@@ -299,9 +337,11 @@ http://stackoverflow.com/a/26081621
 %hook SBLockScreenManager
 
 - (void)_bioAuthenticated:(id)arg1 {
-	if (lockView && self.isUILocked && enabled && !shouldNotDelay && !self.bioAuthenticatedWhileMenuButtonDown && ![[self lockScreenViewController] isPasscodeLockVisible]) {
+	if (lockView && self.isUILocked && enabled && !authenticated && !shouldNotDelay && !self.bioAuthenticatedWhileMenuButtonDown && ![[self lockScreenViewController] isPasscodeLockVisible]) {
+		fingerglyph.userInteractionEnabled = NO;
 		authenticated = YES;
 		performTickAnimation();
+
 		double delayInSeconds = 1.3;
 		if (!useTickAnimation) {
 			delayInSeconds = 0.3;
@@ -312,17 +352,13 @@ http://stackoverflow.com/a/26081621
 				delayInSeconds = 0.1;
 			}
 		}
-		unlockTimer = [NSTimer scheduledTimerWithTimeInterval:delayInSeconds block:^{
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){ 
 			if (!useTickAnimation && useUnlockSound && unlockSound) {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
-			fingerglyph.delegate = nil;
-			resetFingerScanAnimation();
-			usingGlyph = NO;
-			lockView = nil;
-			fingerglyph = nil;
+			fingerglyph.userInteractionEnabled = YES;
 			%orig;
-		} repeats:NO];
+		});
 	} else {
 		if (shouldNotDelay) {
 			authenticated = YES;
@@ -330,6 +366,17 @@ http://stackoverflow.com/a/26081621
 		}
 		%orig;
 	}
+}
+
+-(void)_finishUIUnlockFromSource:(int)source withOptions:(id)options {
+	if (fingerglyph) {
+		fingerglyph.delegate = nil;
+		resetFingerScanAnimation();
+		usingGlyph = NO;
+		lockView = nil;
+		fingerglyph = nil;
+	}
+	%orig;
 }
 
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)arg2 {
@@ -417,20 +464,6 @@ http://stackoverflow.com/a/26081621
 - (void)passcodeLockViewPasscodeEntered:(id)arg1 {
 	%orig;
 	fingerglyph.hidden = NO;
-}
-
-%end
-
-%hook SBAssistantController
-
--(void)_viewDidAppearOnMainScreen:(BOOL)_view {
-	// unlockTimer sometimes isn't an NSTimer. These lines crash SpringBoard (excluding the last 2) - investigate
-	if (unlockTimer && [unlockTimer isKindOfClass:[NSTimer class]]) {
-		[unlockTimer invalidate];
-		unlockTimer = nil;
-	}
-	[[%c(SBLockScreenManager) sharedInstance] _lockUI];
-	%orig;
 }
 
 %end
