@@ -120,16 +120,16 @@ static void performShakeFingerFailAnimation(void) {
 
 %new
 - (void)lockGlyphTapHandler:(UITapGestureRecognizer *)recognizer {
-	authenticated = YES;
 	performFingerScanAnimation();
 	fingerglyph.userInteractionEnabled = NO;
 	if (!shouldNotDelay) {
-		double delayInSeconds = 0.3;
+		double delayInSeconds = 0.5;
 		if (useFasterAnimations) {
-			delayInSeconds = 0.1;
+			delayInSeconds = 0.4;
 		}
 		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){ 
 			if (useTickAnimation) {
+				authenticated = YES;
 				performTickAnimation();
 
 				double delayInSeconds = 1.0;
@@ -140,6 +140,7 @@ static void performShakeFingerFailAnimation(void) {
 					if (!useTickAnimation && useUnlockSound && unlockSound) {
 						AudioServicesPlaySystemSound(unlockSound);
 					}
+					authenticated = NO;
 					[[%c(SBLockScreenManager) sharedInstance] unlockUIFromSource:0 withOptions:nil];
 					resetFingerScanAnimation();
 					fingerglyph.userInteractionEnabled = YES;
@@ -212,8 +213,8 @@ static void performShakeFingerFailAnimation(void) {
 			fingerglyph.customImage = [UIImage imageWithCGImage:customImage.CGImage scale:[UIScreen mainScreen].scale orientation:customImage.imageOrientation];
 			[fingerglyph setState:5 animated:YES completionHandler:nil];
 		}
-		//UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(lockGlyphTapHandler:)];
-		//[fingerglyph addGestureRecognizer:tap];
+		UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(lockGlyphTapHandler:)];
+		[fingerglyph addGestureRecognizer:tap];
 
 		CGRect screen = [[UIScreen mainScreen] bounds];
 		if (UIInterfaceOrientationIsLandscape([[UIApplication sharedApplication] statusBarOrientation])) {
