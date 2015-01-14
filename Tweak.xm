@@ -160,10 +160,10 @@ static void performShakeFingerFailAnimation(void) {
 
 %new
 - (void)LG_RevertUI:(NSNotification *)notification {
-  if (enabled && usingGlyph && fingerglyph) {
-	fingerglyph.secondaryColor = secondaryColor;
-	fingerglyph.primaryColor = primaryColor;
-  }
+	if (enabled && usingGlyph && fingerglyph) {
+		fingerglyph.secondaryColor = secondaryColor;
+		fingerglyph.primaryColor = primaryColor;
+	}
 }
  
  %new
@@ -172,34 +172,34 @@ static void performShakeFingerFailAnimation(void) {
 	UIColor *primaryColor = userInfo[@"PrimaryColor"];
 	UIColor *secondaryColor = userInfo[@"SecondaryColor"];
 	if (enabled && usingGlyph && fingerglyph) {
-	  fingerglyph.primaryColor = primaryColor;
-	  fingerglyph.secondaryColor = secondaryColor;
+		fingerglyph.primaryColor = primaryColor;
+		fingerglyph.secondaryColor = secondaryColor;
 	}
 }
 
 - (void)dealloc {
-  NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
-  NSString *color = @"ColorFlowLockScreenColorizationNotification";
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
-  [[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
-  %orig;
-}
-
--(void)didMoveToWindow {
-	if (enabled) {
-	// So we don't receive multiple notifications from over registering.
 	NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
 	NSString *color = @"ColorFlowLockScreenColorizationNotification";
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
 	[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-										 selector:@selector(LG_RevertUI:)
-											 name:revert
-										   object:nil];
-	[[NSNotificationCenter defaultCenter] addObserver:self
-											 selector:@selector(LG_ColorizeUI:)
-												 name:color
+	%orig;
+}
+
+-(void)didMoveToWindow {
+	if (enabled) {
+		// So we don't receive multiple notifications from over registering.
+		NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
+		NSString *color = @"ColorFlowLockScreenColorizationNotification";
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+											 selector:@selector(LG_RevertUI:)
+												 name:revert
 											   object:nil];
+		[[NSNotificationCenter defaultCenter] addObserver:self
+												 selector:@selector(LG_ColorizeUI:)
+													 name:color
+												   object:nil];
 
 		lockView = (UIView *)self;
 		usingGlyph = YES;
@@ -357,14 +357,17 @@ http://stackoverflow.com/a/26081621
 			if (!useTickAnimation && useUnlockSound && unlockSound) {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
-			fingerglyph.userInteractionEnabled = YES;
+			if (fingerglyph) {
+				fingerglyph.userInteractionEnabled = YES;
+				fingerglyph.delegate = nil;
+				usingGlyph = NO;
+				lockView = nil;
+				[fingerglyph release];
+				fingerglyph = nil;
+			}
 			%orig;
 		});
 	} else {
-		if (shouldNotDelay) {
-			authenticated = YES;
-			performTickAnimation();
-		}
 		%orig;
 	}
 }
@@ -372,9 +375,9 @@ http://stackoverflow.com/a/26081621
 -(void)_finishUIUnlockFromSource:(int)source withOptions:(id)options {
 	if (fingerglyph) {
 		fingerglyph.delegate = nil;
-		resetFingerScanAnimation();
 		usingGlyph = NO;
 		lockView = nil;
+		[fingerglyph release];
 		fingerglyph = nil;
 	}
 	%orig;
