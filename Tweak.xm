@@ -178,6 +178,14 @@ static void performShakeFingerFailAnimation(void) {
 }
 
 -(void)didMoveToWindow {
+	if (!self.window) {
+		NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
+		NSString *color = @"ColorFlowLockScreenColorizationNotification";
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+		return;
+	}
+
 	if (enabled) {
 	// So we don't receive multiple notifications from over registering.
 	NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
@@ -363,10 +371,6 @@ http://stackoverflow.com/a/26081621
 
 -(void)_finishUIUnlockFromSource:(int)source withOptions:(id)options {
 	if (fingerglyph) {
-		NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
-		NSString *color = @"ColorFlowLockScreenColorizationNotification";
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
 		fingerglyph.delegate = nil;
 		usingGlyph = NO;
 		lockView = nil;
