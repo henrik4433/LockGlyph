@@ -183,6 +183,12 @@ static void performShakeFingerFailAnimation(void) {
 		NSString *color = @"ColorFlowLockScreenColorizationNotification";
 		[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
 		[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+		if (fingerglyph) {
+			fingerglyph.delegate = nil;
+			usingGlyph = NO;
+			lockView = nil;
+			fingerglyph = nil;
+		}
 		return;
 	}
 
@@ -367,16 +373,6 @@ http://stackoverflow.com/a/26081621
 		}
 		%orig;
 	}
-}
-
--(void)_finishUIUnlockFromSource:(int)source withOptions:(id)options {
-	if (fingerglyph) {
-		fingerglyph.delegate = nil;
-		usingGlyph = NO;
-		lockView = nil;
-		fingerglyph = nil;
-	}
-	%orig;
 }
 
 - (void)biometricEventMonitor:(id)arg1 handleBiometricEvent:(unsigned long long)arg2 {
