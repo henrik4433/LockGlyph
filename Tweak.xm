@@ -381,6 +381,9 @@ http://stackoverflow.com/a/26081621
 		});
 	} else {
 		fingerglyph = nil;
+		if (!useTickAnimation && useUnlockSound && unlockSound && shouldNotDelay) {
+			AudioServicesPlaySystemSound(unlockSound);
+		}
 		%orig;
 	}
 }
