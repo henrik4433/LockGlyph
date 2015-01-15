@@ -82,24 +82,36 @@ static void loadPreferences() {
 }
 
 static void performFingerScanAnimation(void) {
-	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)])
-		[fingerglyph setState:1 animated:YES completionHandler:nil];
+	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)]) {
+		usingGlyph = YES;
+		[fingerglyph setState:1 animated:YES completionHandler:^{
+			usingGlyph = NO;
+		}];
+	}
 }
 
 static void resetFingerScanAnimation(void) {
 	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)]){
+		usingGlyph = YES;
 		if (fingerglyph.customImage)
-			[fingerglyph setState:5 animated:YES completionHandler:nil];
+			[fingerglyph setState:5 animated:YES completionHandler:^{
+				usingGlyph = NO;
+			}];
 		else
-			[fingerglyph setState:0 animated:YES completionHandler:nil];
+			[fingerglyph setState:0 animated:YES completionHandler:^{
+				usingGlyph = NO;
+			}];
 	}
 }
 
 static void performTickAnimation(void) {
-	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)])
+	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)]) {
+		usingGlyph = YES;
 		[fingerglyph setState:6 animated:YES completionHandler:^{
+			usingGlyph = NO;
 			fingerglyph = nil;
 		}];
+	}
 }
 
 static void performShakeFingerFailAnimation(void) {
@@ -205,7 +217,6 @@ static void performShakeFingerFailAnimation(void) {
 												   object:nil];
 
 		lockView = (UIView *)self;
-		usingGlyph = YES;
 		authenticated = NO;
 		fingerglyph = [[%c(PKGlyphView) alloc] initWithStyle:0];
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
