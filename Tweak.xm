@@ -77,7 +77,8 @@ static void loadPreferences() {
 		NSURL *pathURL = [NSURL fileURLWithPath:[themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]];
 		AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
 	} else {
-		unlockSound = nil;
+		NSURL *pathURL = [NSURL fileURLWithPath:@"/System/Library/Frameworks/PassKit.framework/Payment_Success.wav"];
+		AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
 	}
 }
 
