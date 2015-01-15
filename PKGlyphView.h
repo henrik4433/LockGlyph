@@ -55,9 +55,9 @@
 - (void)_performTransitionWithTransitionIndex:(unsigned int)arg1 animated:(BOOL)arg2;
 - (void)_finishTransitionForIndex:(unsigned int)arg1;
 - (void)_executeTransitionCompletionHandlers:(BOOL)arg1;
-- (void)setState:(int)arg1 animated:(BOOL)arg2 completionHandler:(void (^)(NSError *error))arg3;
+- (void)setState:(int)arg1 animated:(BOOL)arg2 completionHandler:(void (^)())arg3;
 - (void)setState:(int)arg1;
-- (void)_executeAfterMinimumAnimationDurationForStateTransition:(void (^)(NSError *error))arg1;
+- (void)_executeAfterMinimumAnimationDurationForStateTransition:(void (^)())arg1;
 - (double)_minimumAnimationDurationForStateTransition;
 - (void)_updateLastAnimationTimeWithAnimationOfDuration:(double)arg1;
 - (void)layoutSubviews;
