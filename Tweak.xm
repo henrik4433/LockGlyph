@@ -20,6 +20,8 @@ SystemSoundID unlockSound;
 
 BOOL authenticated;
 BOOL usingGlyph;
+BOOL doingScanAnimation;
+BOOL doingTickAnimation;
 NSBundle *themeAssets;
 
 BOOL enabled;
@@ -84,32 +86,27 @@ static void loadPreferences() {
 
 static void performFingerScanAnimation(void) {
 	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)]) {
-		usingGlyph = YES;
+		doingScanAnimation = YES;
 		[fingerglyph setState:1 animated:YES completionHandler:^{
-			usingGlyph = NO;
+			doingScanAnimation = NO;
 		}];
 	}
 }
 
 static void resetFingerScanAnimation(void) {
 	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)]){
-		usingGlyph = YES;
 		if (fingerglyph.customImage)
-			[fingerglyph setState:5 animated:YES completionHandler:^{
-				usingGlyph = NO;
-			}];
+			[fingerglyph setState:5 animated:YES completionHandler:nil];
 		else
-			[fingerglyph setState:0 animated:YES completionHandler:^{
-				usingGlyph = NO;
-			}];
+			[fingerglyph setState:0 animated:YES completionHandler:nil];
 	}
 }
 
 static void performTickAnimation(void) {
 	if (fingerglyph && [fingerglyph respondsToSelector:@selector(setState:animated:completionHandler:)]) {
-		usingGlyph = YES;
+		doingTickAnimation = YES;
 		[fingerglyph setState:6 animated:YES completionHandler:^{
-			usingGlyph = NO;
+			doingTickAnimation = NO;
 			fingerglyph = nil;
 		}];
 	}
@@ -219,6 +216,7 @@ static void performShakeFingerFailAnimation(void) {
 
 		lockView = (UIView *)self;
 		authenticated = NO;
+		usingGlyph = YES;
 		fingerglyph = [[%c(PKGlyphView) alloc] initWithStyle:0];
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
 		fingerglyph.secondaryColor = secondaryColor;
@@ -333,7 +331,7 @@ http://stackoverflow.com/a/26081621
 %hook PKFingerprintGlyphView
 
 -(void)_setProgress:(double)arg1 withDuration:(double)arg2 forShapeLayerAtIndex:(unsigned long long)arg {
-	if (lockView && enabled && useFasterAnimations && usingGlyph) {
+	if (lockView && enabled && useFasterAnimations && usingGlyph && (doingTickAnimation || doingScanAnimation)) {
 		if (authenticated) {
 			arg2 = MIN(arg2, 0.1);
 		} else {
@@ -345,7 +343,7 @@ http://stackoverflow.com/a/26081621
 }
 
 - (double)_minimumAnimationDurationForStateTransition {
-	return authenticated && useFasterAnimations && usingGlyph ? 0.1 : %orig;
+	return authenticated && useFasterAnimations && usingGlyph && (doingTickAnimation || doingScanAnimation) ? 0.1 : %orig;
 }
 
 %end
@@ -375,7 +373,6 @@ http://stackoverflow.com/a/26081621
 			if (fingerglyph) {
 				fingerglyph.userInteractionEnabled = YES;
 				fingerglyph.delegate = nil;
-				usingGlyph = NO;
 				lockView = nil;
 			}
 			%orig;
