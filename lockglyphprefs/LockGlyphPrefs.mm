@@ -133,6 +133,7 @@ void ParseSpecifiers(NSArray *specifiers) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Behaviour" target:self] retain];
 	}
 	ParseSpecifiers(_specifiers);
+	[(UINavigationItem *)self.navigationItem setTitle:LocalisedStringForKey(@"BEHAVIOUR_TITLE")];
 	return _specifiers;
 }
 @end
@@ -147,6 +148,7 @@ void ParseSpecifiers(NSArray *specifiers) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Animations" target:self] retain];
 	}
 	ParseSpecifiers(_specifiers);
+	[(UINavigationItem *)self.navigationItem setTitle:LocalisedStringForKey(@"ANIMATIONS_TITLE")];
 	return _specifiers;
 }
 @end
@@ -161,6 +163,7 @@ void ParseSpecifiers(NSArray *specifiers) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Appearance" target:self] retain];
 	}
 	ParseSpecifiers(_specifiers);
+	[(UINavigationItem *)self.navigationItem setTitle:LocalisedStringForKey(@"APPEARANCE_TITLE")];
 	return _specifiers;
 }
 
