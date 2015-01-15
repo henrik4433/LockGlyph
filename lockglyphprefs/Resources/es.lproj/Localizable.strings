@@ -1,0 +1,48 @@
+/* First page */
+"FIRST_SUBTITLE_TEXT" = "Por evilgoldfish.";
+"FIRST_BEHAVIOUR_LABEL" = "Comportamiento";
+"FIRST_APPEARANCE_LABEL" = "Apariencia";
+"FIRST_ANIMATIONS_LABEL" = "Animaciones";
+"FIRST_DEVELOPER_HEADER_TEXT" = "Desarrollador";
+
+/* Behaviour tab */
+"BEHAVIOUR_TITLE" = "Comportamiento";
+/* General */
+"GENERAL_HEADER_TEXT" = "General";
+"GENERAL_LOCKGLYPHTOGL_LABEL" = "Activar LockGlyph";
+"GENERAL_UNLOCKSNDTOGL_LABEL" = "Activar sonido de desbloqueo";
+"GENERAL_UNLOCKIMEDTOGL_LABEL" = "Desbloquear inmediatamente";
+"GENERAL_FOOTER_TEXT" = "Al activar Desbloquear inmediatamente se desbloqueará el dispositivo tan pronto como la huella dactilar sea reconocida o la huella dactilar sea tocada. Activa esto si quieres un desbloqueo lo más rápido posible.";
+/* Failed Unlock Action */
+"FAILUNLOCK_HEADER_TEXT" = "Acción desbloqueo fallido";
+"FAILUNLOCK_VIBRATETOGL_LABEL" = "Vibrar";
+"FAILUNLOCK_SHAKETOGL_LABEL" = "Agitar huella dactilar";
+"FAILUNLOCK_FOOTER_TEXT" = "Se tomarán estás acciones cuando se intente desbloquear el dispositivo con un dedo incorrecto.";
+
+/* Appearance tab */
+"APPEARANCE_TITLE" = "Apariencia";
+/* Themes */
+"THEMES_HEADER_TEXT" = "Temas";
+"THEMES_THEMESELECT_LABEL" = "Tema";
+"THEMES_APPLYTHEME_LABEL" = "Aplicar tema";
+"THEMES_FOOTER_TEXT" = "Al aplicar un tema se hará respring al dispositivo.";
+/* Colours */
+"COLOURS_HEADER_TEXT" = "Colores";
+"COLOURS_IDLECOLOUR_LABEL" = "Color de espera";
+"COLOURS_SCANCOLOUR_LABEL" = "Color de escaneo";
+"COLOURS_RESET_LABEL" = "Resetear colores por defecto";
+/* Fingerprint Position */
+"FINGERPOS_HEADER_TEXT" = "Posición de la huella dactilar";
+"FINGERPOS_PORTRAITYTOGL_LABEL" = "Personalizar vertical Y";
+"FINGERPOS_PORTRAITY_LABEL" = "Vertical Y";
+"FINGERPOS_LANDSCAPEYTOGL_LABEL" = "Personalizar horizontal Y";
+"FINGERPOS_LANDSCAPEY_LABEL" = "Horizontal Y";
+
+/* Animations tab */
+"ANIMATIONS_TITLE" = "Animaciones";
+/* Animations */
+"ANIM_HEADER_TEXT" = "Animaciones";
+"ANIM_TICKTOGL_LABEL" = "Usar animación de tick";
+"ANIM_SHINETOGL_LABEL" = "Usar animación de brillo";
+"ANIM_FASTTOGL_LABEL" = "Usar animaciones más rápidas";
+"ANIM_FOOTER_TEXT" = "Usar animaciones más rápidas hará que la animación de LockGlyph sea más rápida.";
