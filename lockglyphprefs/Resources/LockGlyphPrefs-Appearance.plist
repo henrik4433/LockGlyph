@@ -8,9 +8,9 @@
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Themes</string>
+			<string>THEMES_HEADER_TEXT</string>
 			<key>footerText</key>
-			<string>Applying a theme will respring your device.</string>
+			<string>THEMES_FOOTER_TEXT</string>
 			<key>footerAlignment</key>
 			<integer>1</integer>
 		</dict>
@@ -24,7 +24,7 @@
 			<key>key</key>
 			<string>currentTheme</string>
 			<key>label</key>
-			<string>Theme</string>
+			<string>THEMES_THEMESELECT_LABEL</string>
 			<key>valuesDataSource</key>
 			<string>themeValues</string>
 			<key>titlesDataSource</key>
@@ -42,13 +42,13 @@
 			<key>action</key>
 			<string>respring</string>
 			<key>label</key>
-			<string>Apply theme</string>
+			<string>THEMES_APPLYTHEME_LABEL</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Colours</string>
+			<string>COLOURS_HEADER_TEXT</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -56,7 +56,7 @@
 			<key>cellClass</key>
 			<string>PFColorCell</string>
 			<key>label</key>
-			<string>Idle colour</string>
+			<string>COLOURS_IDLECOLOUR_LABEL</string>
 			<key>color_defaults</key>
 			<string>com.evilgoldfish.lockglyph</string>
 			<key>color_key</key>
@@ -78,7 +78,7 @@
 			<key>cellClass</key>
 			<string>PFColorCell</string>
 			<key>label</key>
-			<string>Scanning colour</string>
+			<string>COLOURS_SCANCOLOUR_LABEL</string>
 			<key>color_defaults</key>
 			<string>com.evilgoldfish.lockglyph</string>
 			<key>color_key</key>
@@ -102,13 +102,13 @@
 			<key>action</key>
 			<string>resetColors</string>
 			<key>label</key>
-			<string>Reset colours to default</string>
+			<string>COLOURS_RESET_LABEL</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Fingerprint Position</string>
+			<string>FINGERPOS_HEADER_TEXT</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -120,7 +120,7 @@
 			<key>key</key>
 			<string>enablePortraitY</string>
 			<key>label</key>
-			<string>Custom Portrait Y</string>
+			<string>FINGERPOS_PORTRAITYTOGL_LABEL</string>
 			<key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
 		</dict>
@@ -128,7 +128,7 @@
 			<key>cell</key>
 			<string>PSEditTextCell</string>
 			<key>label</key>
-			<string>Portrait Y</string>
+			<string>FINGERPOS_PORTRAITY_LABEL</string>
 			<key>defaults</key>
 			<string>com.evilgoldfish.lockglyph</string>
 			<key>key</key>
@@ -148,7 +148,7 @@
 			<key>key</key>
 			<string>enableLandscapeY</string>
 			<key>label</key>
-			<string>Custom Landscape Y</string>
+			<string>FINGERPOS_LANDSCAPEYTOGL_LABEL</string>
 			<key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
 		</dict>
@@ -156,7 +156,7 @@
 			<key>cell</key>
 			<string>PSEditTextCell</string>
 			<key>label</key>
-			<string>Landscape Y</string>
+			<string>FINGERPOS_LANDSCAPEY_LABEL</string>
 			<key>defaults</key>
 			<string>com.evilgoldfish.lockglyph</string>
 			<key>key</key>
@@ -168,6 +168,6 @@
 		</dict>
 	</array>
 	<key>title</key>
-	<string>Appearance</string>
+	<string>APPEARANCE_TITLE</string>
 </dict>
 </plist>

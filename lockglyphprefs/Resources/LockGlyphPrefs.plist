@@ -18,7 +18,7 @@
 			<key>isController</key>
 			<true/>
 			<key>label</key>
-			<string>Behaviour</string>
+			<string>FIRST_BEHAVIOUR_LABEL</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -28,7 +28,7 @@
 			<key>isController</key>
 			<true/>
 			<key>label</key>
-			<string>Appearance</string>
+			<string>FIRST_APPEARANCE_LABEL</string>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -38,13 +38,13 @@
 			<key>isController</key>
 			<true/>
 			<key>label</key>
-			<string>Animations</string>
+			<string>FIRST_ANIMATIONS_LABEL</string>
 		</dict>
 		<dict>
 			<key>cell</key>
 			<string>PSGroupCell</string>
 			<key>label</key>
-			<string>Developer</string>
+			<string>FIRST_DEVELOPER_HEADER_TEXT</string>
 		</dict>
 		<dict>
 			<key>cell</key>

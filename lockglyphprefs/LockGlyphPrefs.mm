@@ -3,6 +3,7 @@
 #import <Preferences/PSDetailController.h>
 
 #define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
+#define kSelfBundlePath @"/Library/PreferenceBundles/LockGlyphPrefs.bundle"
 
 #define kResetColorsAlertTag 1
 #define kApplyThemeAlertTag 2
@@ -25,6 +26,19 @@
 -(void)viewWillAppear:(BOOL)animated;
 @end
 
+NSString *LocalisedStringForKey(NSString *key) {
+	return [[NSBundle bundleWithPath:kSelfBundlePath] localizedStringForKey:key value:@"" table:nil];
+}
+
+void ParseSpecifiers(NSArray *specifiers) {
+	for (PSSpecifier *specifier in specifiers) {
+		NSString *localisedTitle = LocalisedStringForKey(specifier.properties[@"label"]);
+		NSString *localisedFooter = LocalisedStringForKey(specifier.properties[@"footerText"]);
+		[specifier setProperty:localisedFooter forKey:@"footerText"];
+		specifier.name = localisedTitle;
+	}
+}
+
 @interface LockGlyphPrefsListController: PSListController {
 }
 @end
@@ -34,6 +48,7 @@
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs" target:self] retain];
 	}
+	ParseSpecifiers(_specifiers);
 	return _specifiers;
 }
 
@@ -88,7 +103,7 @@
 		tweakSubtitle = [[UILabel alloc] initWithFrame:subtitleFrame];
 		[tweakSubtitle setNumberOfLines:1];
 		[tweakSubtitle setFont:[UIFont fontWithName:@"HelveticaNeue-Regular" size:18]];
-		[tweakSubtitle setText:@"By evilgoldfish."];
+		[tweakSubtitle setText:LocalisedStringForKey(@"FIRST_SUBTITLE_TEXT")];
 		[tweakSubtitle setBackgroundColor:[UIColor clearColor]];
 		[tweakSubtitle setTextColor:[UIColor colorWithRed:119/255.0f green:119/255.0f blue:122/255.0f alpha:1.0f]];
 		[tweakSubtitle setTextAlignment:NSTextAlignmentCenter];
@@ -117,6 +132,7 @@
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Behaviour" target:self] retain];
 	}
+	ParseSpecifiers(_specifiers);
 	return _specifiers;
 }
 @end
@@ -130,6 +146,7 @@
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Animations" target:self] retain];
 	}
+	ParseSpecifiers(_specifiers);
 	return _specifiers;
 }
 @end
@@ -143,6 +160,7 @@
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Appearance" target:self] retain];
 	}
+	ParseSpecifiers(_specifiers);
 	return _specifiers;
 }
 
