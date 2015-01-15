@@ -1,0 +1,48 @@
+/* First page */
+"FIRST_SUBTITLE_TEXT" = "Gemaakt door evilgoldfish.";
+"FIRST_BEHAVIOUR_LABEL" = "Gedrag";
+"FIRST_APPEARANCE_LABEL" = "Uiterlijk";
+"FIRST_ANIMATIONS_LABEL" = "Animaties";
+"FIRST_DEVELOPER_HEADER_TEXT" = "Ontwikkelaar";
+
+/* Behaviour tab */
+"BEHAVIOUR_TITLE" = "Gedrag";
+/* General */
+"GENERAL_HEADER_TEXT" = "Algemeen";
+"GENERAL_LOCKGLYPHTOGL_LABEL" = "LockGlyph aanzetten;
+"GENERAL_UNLOCKSNDTOGL_LABEL" = "Ontgrendel geluid aanzetten";
+"GENERAL_UNLOCKIMEDTOGL_LABEL" = "Meteen ontgrendelen";
+"GENERAL_FOOTER_TEXT" = "Als je Meteen ongrendelen aanzet zal je apparaat meteen worden ontgrendeld als een vingerprint herkend is of als er op getikt is. Zet dit aan als je zo snel mogelijk je apparaat ontgrendeld wilt hebben.";
+/* Failed Unlock Action */
+"FAILUNLOCK_HEADER_TEXT" = "Mislukte ontgrendelpoging";
+"FAILUNLOCK_VIBRATETOGL_LABEL" = "Vibratie";
+"FAILUNLOCK_SHAKETOGL_LABEL" = "Vingerprint schudden";
+"FAILUNLOCK_FOOTER_TEXT" = "Deze acties worden uitgevoerd als een onbevoegde vinger wordt gebruikt om het apparaat te ontgrendelen.";
+
+/* Appearance tab */
+"APPEARANCE_TITLE" = "Uiterlijk";
+/* Themes */
+"THEMES_HEADER_TEXT" = "Thema's";
+"THEMES_THEMESELECT_LABEL" = "Thema";
+"THEMES_APPLYTHEME_LABEL" = "Thema instellen";
+"THEMES_FOOTER_TEXT" = "Door het instellen van een thema zal je appraat respringen.";
+/* Colours */
+"COLOURS_HEADER_TEXT" = "Kleuren";
+"COLOURS_IDLECOLOUR_LABEL" = "Inactieve kleur";
+"COLOURS_SCANCOLOUR_LABEL" = "Scan kleur";
+"COLOURS_RESET_LABEL" = "Kleuren naar standaard herstellen";
+/* Fingerprint Position */
+"FINGERPOS_HEADER_TEXT" = "Vingerprint Positie";
+"FINGERPOS_PORTRAITYTOGL_LABEL" = "Eigen Staande Weergave Y";
+"FINGERPOS_PORTRAITY_LABEL" = "Staande Weergave Y";
+"FINGERPOS_LANDSCAPEYTOGL_LABEL" = "Eigen Liggende Weergave Y";
+"FINGERPOS_LANDSCAPEY_LABEL" = "Ligende Weergave Y";
+
+/* Animations tab */
+"ANIMATIONS_TITLE" = "Animaties";
+/* Animations */
+"ANIM_HEADER_TEXT" = "Animaties";
+"ANIM_TICKTOGL_LABEL" = "Gebruik vink animatie";
+"ANIM_SHINETOGL_LABEL" = "Gebruik glimmende animatie";
+"ANIM_FASTTOGL_LABEL" = "Gebruik snellere animaties";
+"ANIM_FOOTER_TEXT" = "Door snellere animaties te gebruiken zal LockGlyph sneller werken.";
