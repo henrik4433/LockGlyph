@@ -19,6 +19,12 @@
 - (id)initWithStyle:(int)style reuseIdentifier:(id)arg2;
 @end
 
+@interface PSListController ()
+-(void)clearCache;
+-(void)reload;
+-(void)viewWillAppear:(BOOL)animated;
+@end
+
 @interface LockGlyphPrefsListController: PSListController {
 }
 @end
@@ -138,6 +144,13 @@
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Appearance" target:self] retain];
 	}
 	return _specifiers;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+	[self clearCache];
+	[self reload];  
+	[super viewWillAppear:animated];
 }
 
 -(void)resetColors {
