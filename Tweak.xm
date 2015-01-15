@@ -2,6 +2,7 @@
 #import <AudioToolbox/AudioServices.h>
 #import "PKGlyphView.h"
 #import "SBLockScreenManager.h"
+#import "SpacemanBlocks.h"
 
 #define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
 
@@ -23,6 +24,7 @@ BOOL usingGlyph;
 BOOL doingScanAnimation;
 BOOL doingTickAnimation;
 NSBundle *themeAssets;
+SMDelayedBlockHandle unlockBlock;
 
 BOOL enabled;
 BOOL useUnlockSound;
@@ -348,10 +350,19 @@ http://stackoverflow.com/a/26081621
 
 %end
 
+@interface SBAssistantController : NSObject
++(BOOL)isAssistantVisible;
+@end
+
 %hook SBLockScreenManager
 
 - (void)_bioAuthenticated:(id)arg1 {
-	if (lockView && self.isUILocked && enabled && !authenticated && !shouldNotDelay && !self.bioAuthenticatedWhileMenuButtonDown && ![[self lockScreenViewController] isPasscodeLockVisible]) {
+	if ([%c(SBAssistantController) isAssistantVisible] || self.bioAuthenticatedWhileMenuButtonDown) {
+		if (unlockBlock)
+			cancel_delayed_block(unlockBlock);
+		return;
+	}
+	if (lockView && self.isUILocked && enabled && !authenticated && !shouldNotDelay && ![[self lockScreenViewController] isPasscodeLockVisible]) {
 		fingerglyph.userInteractionEnabled = NO;
 		authenticated = YES;
 		performTickAnimation();
@@ -366,7 +377,7 @@ http://stackoverflow.com/a/26081621
 				delayInSeconds = 0.1;
 			}
 		}
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){ 
+		unlockBlock = perform_block_after_delay(delayInSeconds, ^(void){ 
 			if (!useTickAnimation && useUnlockSound && unlockSound) {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
@@ -378,11 +389,16 @@ http://stackoverflow.com/a/26081621
 			%orig;
 		});
 	} else {
-		fingerglyph = nil;
-		if (!useTickAnimation && useUnlockSound && unlockSound && shouldNotDelay) {
-			AudioServicesPlaySystemSound(unlockSound);
-		}
+		if (self.bioAuthenticatedWhileMenuButtonDown)
+			return;
+
 		%orig;
+		if (!self.isUILocked) {
+			if (!useTickAnimation && useUnlockSound && unlockSound && shouldNotDelay) {
+				AudioServicesPlaySystemSound(unlockSound);
+			}
+			fingerglyph = nil;
+		}
 	}
 }
 
@@ -480,6 +496,17 @@ http://stackoverflow.com/a/26081621
 - (void)passcodeLockViewPasscodeEntered:(id)arg1 {
 	%orig;
 	fingerglyph.hidden = NO;
+}
+
+%end
+
+%hook SBAssistantController
+
+-(void)_viewWillDisappearOnMainScreen:(BOOL)_view {
+	if (fingerglyph) {
+		resetFingerScanAnimation();
+	}
+	%orig;
 }
 
 %end
