@@ -175,28 +175,41 @@ void ParseSpecifiers(NSArray *specifiers) {
 }
 
 -(void)resetColors {
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Reset colours"
+	/*UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Reset colours"
 		message:@"Are you sure you want to reset colours?"
 		delegate:self     
 		cancelButtonTitle:@"No" 
 		otherButtonTitles:@"Yes", nil];
 	alert.tag = kResetColorsAlertTag;
 	[alert show];
-	[alert release];
+	[alert release];*/
+	CFPreferencesSetAppValue(CFSTR("primaryColor"), CFSTR("#BCBCBC:1.000000"), CFSTR("com.evilgoldfish.lockglyph"));
+    		CFPreferencesSetAppValue(CFSTR("secondaryColor"), CFSTR("#777777:1.000000"), CFSTR("com.evilgoldfish.lockglyph"));
+    		CFPreferencesAppSynchronize(CFSTR("com.evilgoldfish.lockglyph"));
+    		CFNotificationCenterPostNotification(
+    			CFNotificationCenterGetDarwinNotifyCenter(),
+    			CFSTR("com.evilgoldfish.lockglyph.settingschanged"),
+    			NULL,
+    			NULL,
+    			YES
+    			);
+    [self clearCache];
+	[self reload];
 }
 
 -(void)respring {
-	UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Apply Theme"
+	/*UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Apply Theme"
                                                     message:@"Are you sure you want to apply a theme?\n\nThis will make your device respring."
                                                    delegate:self
                                           cancelButtonTitle:@"No"
                                           otherButtonTitles:@"Yes", nil];
     alert.tag = kApplyThemeAlertTag;
     [alert show];
-    [alert release];
+    [alert release];*/
+    system("killall -9 backboardd");
 }
 
-- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+/*- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
     if (buttonIndex == 1) { // Tapped yes
     	if (alertView.tag == kResetColorsAlertTag) {
     		CFPreferencesSetAppValue(CFSTR("primaryColor"), CFSTR("#BCBCBC:1.000000"), CFSTR("com.evilgoldfish.lockglyph"));
@@ -213,7 +226,7 @@ void ParseSpecifiers(NSArray *specifiers) {
     		system("killall -9 backboardd");
     	}
     }
-}
+}*/
 
 -(NSArray *)themeTitles {
     NSMutableArray* files = [[[NSFileManager defaultManager]
