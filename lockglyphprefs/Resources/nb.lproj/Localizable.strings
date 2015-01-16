@@ -1,23 +1,23 @@
 /* First page */
-"FIRST_SUBTITLE_TEXT" = "By evilgoldfish.";
-"FIRST_BEHAVIOUR_LABEL" = "Oppførsel";
+"FIRST_SUBTITLE_TEXT" = "Laget av evilgoldfish.";
+"FIRST_BEHAVIOUR_LABEL" = "OppfÃ¸rsel";
 "FIRST_APPEARANCE_LABEL" = "Utseende";
 "FIRST_ANIMATIONS_LABEL" = "Animasjoner";
 "FIRST_DEVELOPER_HEADER_TEXT" = "Utvikler";
 
 /* Behaviour tab */
-"BEHAVIOUR_TITLE" = "Oppførsel";
+"BEHAVIOUR_TITLE" = "OppfÃ¸rsel";
 /* General */
 "GENERAL_HEADER_TEXT" = "Generelt";
 "GENERAL_LOCKGLYPHTOGL_LABEL" = "Aktiver LockGlyph";
-"GENERAL_UNLOCKSNDTOGL_LABEL" = "Aktiver opplåsningslyd";
-"GENERAL_UNLOCKIMEDTOGL_LABEL" = "Lås opp umiddelbart";
-"GENERAL_FOOTER_TEXT" = "Aktiverng av Lås opp umiddelbart vil låse opp enheten så snart et fingeravtrykk er gjenkjent eller når fingeravtrykket er trykket. Aktiver dette hvis du vil låse opp enheten så fort som mulig";
+"GENERAL_UNLOCKSNDTOGL_LABEL" = "Aktiver opplÃ¥sningslyd";
+"GENERAL_UNLOCKIMEDTOGL_LABEL" = "LÃ¥s opp umiddelbart";
+"GENERAL_FOOTER_TEXT" = "Aktiverng av LÃ¥s opp umiddelbart vil lÃ¥se opp enheten sÃ¥ snart et fingeravtrykk er gjenkjent eller nÃ¥r fingeren legges pÃ¥ fingeravtrykkleseren. Aktiver denne innstilligen hvis du vil lÃ¥se opp enheten sÃ¥ fort som mulig";
 /* Failed Unlock Action */
-"FAILUNLOCK_HEADER_TEXT" = "Opplåsning mislyktes";
-"FAILUNLOCK_VIBRATETOGL_LABEL" = "Vibrere";
-"FAILUNLOCK_SHAKETOGL_LABEL" = "Rist fingeravtrykk";
-"FAILUNLOCK_FOOTER_TEXT" = "Disse handlingene vil bli gjort når feil fingeravtrykk blir brukt for å låse opp enheten.";
+"FAILUNLOCK_HEADER_TEXT" = "OpplÃ¥sning mislyktes";
+"FAILUNLOCK_VIBRATETOGL_LABEL" = "Vibrer";
+"FAILUNLOCK_SHAKETOGL_LABEL" = "Rist fingeravtrykksymbolet";
+"FAILUNLOCK_FOOTER_TEXT" = "Disse handlingene vil utfÃ¸res om man forsÃ¸ker Ã¥ lÃ¥se opp enheten med feil fingeravtrykk.";
 
 /* Appearance tab */
 "APPEARANCE_TITLE" = "Utseende";
@@ -28,21 +28,21 @@
 "THEMES_FOOTER_TEXT" = "Aktivering av et tema vil respringe enheten.";
 /* Colours */
 "COLOURS_HEADER_TEXT" = "Farger";
-"COLOURS_IDLECOLOUR_LABEL" = "Idle farge";
-"COLOURS_SCANCOLOUR_LABEL" = "Skanning farge";
+"COLOURS_IDLECOLOUR_LABEL" = "Farge ved inaktivitet";
+"COLOURS_SCANCOLOUR_LABEL" = "Farge ved skanning";
 "COLOURS_RESET_LABEL" = "Tilbakestill farger til standard";
 /* Fingerprint Position */
-"FINGERPOS_HEADER_TEXT" = "Fingeravtrykk Posisjon";
-"FINGERPOS_PORTRAITYTOGL_LABEL" = "Egendefinert Stående Y";
-"FINGERPOS_PORTRAITY_LABEL" = "Stående Y";
-"FINGERPOS_LANDSCAPEYTOGL_LABEL" = "Egendefinert Liggende Y";
-"FINGERPOS_LANDSCAPEY_LABEL" = "Liggende Y";
+"FINGERPOS_HEADER_TEXT" = "Posisjon til fingeravtrykk";
+"FINGERPOS_PORTRAITYTOGL_LABEL" = "Egendefinert Portrett Y";
+"FINGERPOS_PORTRAITY_LABEL" = "Portrett Y";
+"FINGERPOS_LANDSCAPEYTOGL_LABEL" = "Egendefinert Landskap Y";
+"FINGERPOS_LANDSCAPEY_LABEL" = "Landskap Y";
 
 /* Animations tab */
 "ANIMATIONS_TITLE" = "Animasjoner";
 /* Animations */
 "ANIM_HEADER_TEXT" = "Animasjoner";
-"ANIM_TICKTOGL_LABEL" = "Bruk hake animasjon";
+"ANIM_TICKTOGL_LABEL" = "Bruk hakeanimasjon";
 "ANIM_SHINETOGL_LABEL" = "Bruk skinnende animasjon";
 "ANIM_FASTTOGL_LABEL" = "Bruk raskere animasjoner";
-"ANIM_FOOTER_TEXT" = "Bruk raskere animasjoner vil gjøre LockGlyph animasjoner mye raskere.";
+"ANIM_FOOTER_TEXT" = "Om raskere animasjoner er pÃ¥slÃ¥tt vil LockGlyphs animasjoner vÃ¦re hurtigere.";
