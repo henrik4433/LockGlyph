@@ -1,0 +1,48 @@
+/* First page */
+"FIRST_SUBTITLE_TEXT" = "By evilgoldfish.";
+"FIRST_BEHAVIOUR_LABEL" = "Verhalten";
+"FIRST_APPEARANCE_LABEL" = "Erscheinung";
+"FIRST_ANIMATIONS_LABEL" = "Animationen";
+"FIRST_DEVELOPER_HEADER_TEXT" = "Entwickler";
+
+/* Behaviour tab */
+"BEHAVIOUR_TITLE" = "Verhalten";
+/* General */
+"GENERAL_HEADER_TEXT" = "General";
+"GENERAL_LOCKGLYPHTOGL_LABEL" = "Aktiviere LockGlyph";
+"GENERAL_UNLOCKSNDTOGL_LABEL" = "Aktiviere entsperrungs Ton";
+"GENERAL_UNLOCKIMEDTOGL_LABEL" = "sofortiges Entsperren";
+"GENERAL_FOOTER_TEXT" = "Sofortiges Entsperren entsperrt das Gerät sobald ein Fingerabdruck erkannt wird oder der Fingerabdruck berührt wird. Aktivieren Sie dies, wenn Sie das Gerät so schnell wie möglich entsperren wollen.";
+/* Failed Unlock Action */
+"FAILUNLOCK_HEADER_TEXT" = "Fehlgeschlagene entsperrungs Aktion";
+"FAILUNLOCK_VIBRATETOGL_LABEL" = "Bei fehlgeschlagenem Entsprerren vibrieren";
+"FAILUNLOCK_SHAKETOGL_LABEL" = "Bei fehlgeschlagenem Entsperren Fingerabrdruck wackeln";
+"FAILUNLOCK_FOOTER_TEXT" = "Diese Aktionen werden ausgeführt wenn ein falscher Finger benutzt wird um das Gerät zu entsperren.";
+
+/* Appearance tab */
+"APPEARANCE_TITLE" = "Erscheinung";
+/* Themes */
+"THEMES_HEADER_TEXT" = "themes";
+"THEMES_THEMESELECT_LABEL" = "theme";
+"THEMES_APPLYTHEME_LABEL" = "theme anwenden";
+"THEMES_FOOTER_TEXT" = "Anwenden des themes wird einen Respring auslösen.";
+/* Colours */
+"COLOURS_HEADER_TEXT" = "Farben";
+"COLOURS_IDLECOLOUR_LABEL" = "Leerlauf-Farbscanner";
+"COLOURS_SCANCOLOUR_LABEL" = "Farbscanner";
+"COLOURS_RESET_LABEL" = "Farben zurücksetzen";
+/* Fingerprint Position */
+"FINGERPOS_HEADER_TEXT" = "Position des Fingerabdrucks";
+"FINGERPOS_PORTRAITYTOGL_LABEL" = "Benutzerdefinierte Position in Portrait-Ansicht Y";
+"FINGERPOS_PORTRAITY_LABEL" = "Portrait-Ansicht Y";
+"FINGERPOS_LANDSCAPEYTOGL_LABEL" = "Benutzerdefinierte Position in Landscape-Ansicht Y";
+"FINGERPOS_LANDSCAPEY_LABEL" = "Landscape-Ansicht Y";
+
+/* Animations tab */
+"ANIMATIONS_TITLE" = "Animationen";
+/* Animations */
+"ANIM_HEADER_TEXT" = "Animationen";
+"ANIM_TICKTOGL_LABEL" = "tick animation verwenden";
+"ANIM_SHINETOGL_LABEL" = "shine animation verwenden";
+"ANIM_FASTTOGL_LABEL" = "schnellere Animationen verwenden";
+"ANIM_FOOTER_TEXT" = "Das Verwenden von schnelleren Animationen macht LockGlyph sehr viel schneller";
