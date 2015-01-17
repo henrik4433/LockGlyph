@@ -26,18 +26,27 @@
 -(void)viewWillAppear:(BOOL)animated;
 @end
 
-NSString *LocalisedStringForKey(NSString *key) {
-	return [[NSBundle bundleWithPath:kSelfBundlePath] localizedStringForKey:key value:@"" table:nil];
+@interface LGShared : NSObject
++(NSString *)localisedStringForKey:(NSString *)key;
++(void)parseSpecifiers:(NSArray *)specifiers;
+@end
+
+@implementation LGShared
+
++(NSString *)localisedStringForKey:(NSString *)key {
+	NSString *englishString = [[NSBundle bundleWithPath:[NSString stringWithFormat:@"%@/en.lproj",kSelfBundlePath]] localizedStringForKey:key value:@"" table:nil];
+	return [[NSBundle bundleWithPath:kSelfBundlePath] localizedStringForKey:key value:englishString table:nil];
 }
 
-void ParseSpecifiers(NSArray *specifiers) {
++(void)parseSpecifiers:(NSArray *)specifiers {
 	for (PSSpecifier *specifier in specifiers) {
-		NSString *localisedTitle = LocalisedStringForKey(specifier.properties[@"label"]);
-		NSString *localisedFooter = LocalisedStringForKey(specifier.properties[@"footerText"]);
+		NSString *localisedTitle = [LGShared localisedStringForKey:specifier.properties[@"label"]];
+		NSString *localisedFooter = [LGShared localisedStringForKey:specifier.properties[@"footerText"]];
 		[specifier setProperty:localisedFooter forKey:@"footerText"];
 		specifier.name = localisedTitle;
 	}
 }
+@end
 
 @interface LockGlyphPrefsListController: PSListController {
 }
@@ -48,7 +57,7 @@ void ParseSpecifiers(NSArray *specifiers) {
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs" target:self] retain];
 	}
-	ParseSpecifiers(_specifiers);
+	[LGShared parseSpecifiers:_specifiers];
 	return _specifiers;
 }
 
@@ -103,7 +112,7 @@ void ParseSpecifiers(NSArray *specifiers) {
 		tweakSubtitle = [[UILabel alloc] initWithFrame:subtitleFrame];
 		[tweakSubtitle setNumberOfLines:1];
 		[tweakSubtitle setFont:[UIFont fontWithName:@"HelveticaNeue-Regular" size:18]];
-		[tweakSubtitle setText:LocalisedStringForKey(@"FIRST_SUBTITLE_TEXT")];
+		[tweakSubtitle setText:[LGShared localisedStringForKey:@"FIRST_SUBTITLE_TEXT"]];
 		[tweakSubtitle setBackgroundColor:[UIColor clearColor]];
 		[tweakSubtitle setTextColor:[UIColor colorWithRed:119/255.0f green:119/255.0f blue:122/255.0f alpha:1.0f]];
 		[tweakSubtitle setTextAlignment:NSTextAlignmentCenter];
@@ -132,8 +141,8 @@ void ParseSpecifiers(NSArray *specifiers) {
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Behaviour" target:self] retain];
 	}
-	ParseSpecifiers(_specifiers);
-	[(UINavigationItem *)self.navigationItem setTitle:LocalisedStringForKey(@"BEHAVIOUR_TITLE")];
+	[LGShared parseSpecifiers:_specifiers];
+	[(UINavigationItem *)self.navigationItem setTitle:[LGShared localisedStringForKey:@"BEHAVIOUR_TITLE"]];
 	return _specifiers;
 }
 @end
@@ -147,8 +156,8 @@ void ParseSpecifiers(NSArray *specifiers) {
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Animations" target:self] retain];
 	}
-	ParseSpecifiers(_specifiers);
-	[(UINavigationItem *)self.navigationItem setTitle:LocalisedStringForKey(@"ANIMATIONS_TITLE")];
+	[LGShared parseSpecifiers:_specifiers];
+	[(UINavigationItem *)self.navigationItem setTitle:[LGShared localisedStringForKey:@"ANIMATIONS_TITLE"]];
 	return _specifiers;
 }
 @end
@@ -162,8 +171,8 @@ void ParseSpecifiers(NSArray *specifiers) {
 	if(_specifiers == nil) {
 		_specifiers = [[self loadSpecifiersFromPlistName:@"LockGlyphPrefs-Appearance" target:self] retain];
 	}
-	ParseSpecifiers(_specifiers);
-	[(UINavigationItem *)self.navigationItem setTitle:LocalisedStringForKey(@"APPEARANCE_TITLE")];
+	[LGShared parseSpecifiers:_specifiers];
+	[(UINavigationItem *)self.navigationItem setTitle:[LGShared localisedStringForKey:@"APPEARANCE_TITLE"]];
 	return _specifiers;
 }
 
