@@ -250,27 +250,6 @@ static void performShakeFingerFailAnimation(void) {
 	}
 }
 
-%new(v@:)
--(void)performFingerScanAnimation {
-	[fingerglyph setState:1 animated:YES completionHandler:nil];
-}
-
-%new
-- (void)resetFingerScanAnimation {
-	[fingerglyph setState:0 animated:YES completionHandler:nil];
-}
-
-%new
-- (void)performShakeFingerFailAnimation {
-	CABasicAnimation *shakeanimation = [CABasicAnimation animationWithKeyPath:@"position"];
-	[shakeanimation setDuration:0.05];
-	[shakeanimation setRepeatCount:4];
-	[shakeanimation setAutoreverses:YES];
-	[shakeanimation setFromValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x - 10, fingerglyph.center.y)]];
-	[shakeanimation setToValue:[NSValue valueWithCGPoint:CGPointMake(fingerglyph.center.x + 10, fingerglyph.center.y)]];
-	[[fingerglyph layer] addAnimation:shakeanimation forKey:@"position"];
-}
-
 /* Not my method, taken from this Stack Overflow
 answer:
 http://stackoverflow.com/a/26081621
@@ -314,11 +293,6 @@ http://stackoverflow.com/a/26081621
 	[gradient addAnimation:theAnimation forKey:@"animateLayer"];
 
 	aView.layer.mask = gradient;
-}
-
-%new(v@:)
--(void)performTickAnimation {
-	[fingerglyph setState:6 animated:YES completionHandler:nil];
 }
 
 %new(v@:@c)
