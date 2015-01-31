@@ -72,12 +72,14 @@ static void loadPreferences() {
 	themeBundleName = !CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph")) ? @"LockGlyph-Default.bundle" : (__bridge id)CFPreferencesCopyAppValue(CFSTR("currentTheme"), CFSTR("com.evilgoldfish.lockglyph"));
 	shouldNotDelay = !CFPreferencesCopyAppValue(CFSTR("shouldNotDelay"), CFSTR("com.evilgoldfish.lockglyph")) ? NO : [(__bridge id)CFPreferencesCopyAppValue(CFSTR("shouldNotDelay"), CFSTR("com.evilgoldfish.lockglyph")) boolValue];
 
-	themeAssets = [[NSBundle alloc] initWithPath:[kBundlePath stringByAppendingString:themeBundleName]];
+	NSURL *bundleURL = [[NSURL alloc] initFileURLWithPath:kBundlePath];
+	themeAssets = nil;
+	themeAssets = [[NSBundle alloc] initWithURL:[bundleURL URLByAppendingPathComponent:themeBundleName]];
 
 	if (unlockSound)
 		AudioServicesDisposeSystemSoundID(unlockSound);
 
-	if ([themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]) {
+	if ([[NSFileManager defaultManager] fileExistsAtPath:[themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]]) {
 		NSURL *pathURL = [NSURL fileURLWithPath:[themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]];
 		AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
 	} else {
@@ -223,10 +225,12 @@ static void performShakeFingerFailAnimation(void) {
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
 		fingerglyph.secondaryColor = secondaryColor;
 		fingerglyph.primaryColor = primaryColor;
-		if (themeAssets && [UIImage imageNamed:@"IdleImage.png" inBundle:themeAssets compatibleWithTraitCollection:nil]) {
-			UIImage *customImage = [UIImage imageNamed:@"IdleImage.png" inBundle:themeAssets compatibleWithTraitCollection:nil];
+		if (themeAssets && [[NSFileManager defaultManager] fileExistsAtPath:[themeAssets pathForResource:@"IdleImage" ofType:@"png"]]) {
+			UIImage *customImage = [UIImage imageWithContentsOfFile:[themeAssets pathForResource:@"IdleImage" ofType:@"png"]];
 			fingerglyph.customImage = [UIImage imageWithCGImage:customImage.CGImage scale:[UIScreen mainScreen].scale orientation:customImage.imageOrientation];
 			[fingerglyph setState:5 animated:YES completionHandler:nil];
+		} else {
+			fingerglyph.customImage = nil;
 		}
 		UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(lockGlyphTapHandler:)];
 		[fingerglyph addGestureRecognizer:tap];
@@ -380,6 +384,7 @@ http://stackoverflow.com/a/26081621
 	if (fingerglyph) {
 		fingerglyph.delegate = nil;
 		usingGlyph = NO;
+		themeAssets = nil;
 		lockView = nil;
 	}
 	%orig;

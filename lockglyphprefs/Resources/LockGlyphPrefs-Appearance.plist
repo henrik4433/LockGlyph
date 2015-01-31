@@ -9,10 +9,6 @@
 			<string>PSGroupCell</string>
 			<key>label</key>
 			<string>THEMES_HEADER_TEXT</string>
-			<key>footerText</key>
-			<string>THEMES_FOOTER_TEXT</string>
-			<key>footerAlignment</key>
-			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>cell</key>
@@ -33,16 +29,6 @@
 			<string>LockGlyph-Default</string>
 			<key>PostNotification</key>
 			<string>com.evilgoldfish.lockglyph.settingschanged</string>
-		</dict>
-		<dict>
-			<key>cell</key>
-			<string>PSButtonCell</string>
-			<key>id</key>
-			<string>applyThemeButton</string>
-			<key>action</key>
-			<string>respring</string>
-			<key>label</key>
-			<string>THEMES_APPLYTHEME_LABEL</string>
 		</dict>
 		<dict>
 			<key>cell</key>
