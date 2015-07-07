@@ -83,7 +83,7 @@ static void loadPreferences() {
 		NSURL *pathURL = [NSURL fileURLWithPath:[themeAssets pathForResource:@"SuccessSound" ofType:@"wav"]];
 		AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
 	} else {
-		NSURL *pathURL = [NSURL fileURLWithPath:@"/System/Library/Frameworks/PassKit.framework/Payment_Success.wav"];
+		NSURL *pathURL = [NSURL fileURLWithPath:@"/Library/Application Support/LockGlyph/Themes/LockGlyph-Default.bundle/SuccessSound.wav"];
 		AudioServicesCreateSystemSoundID((__bridge CFURLRef) pathURL, &unlockSound);
 	}
 }
@@ -384,7 +384,6 @@ http://stackoverflow.com/a/26081621
 	if (fingerglyph) {
 		fingerglyph.delegate = nil;
 		usingGlyph = NO;
-		themeAssets = nil;
 		lockView = nil;
 	}
 	%orig;
