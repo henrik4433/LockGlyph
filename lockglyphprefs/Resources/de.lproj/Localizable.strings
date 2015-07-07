@@ -63,7 +63,7 @@
 	<key>GENERAL_UNLOCKIMEDTOGL_LABEL</key>
 	<string>Sofort Entsperren</string>
 	<key>GENERAL_UNLOCKSNDTOGL_LABEL</key>
-	<string>Entsperren aktivieren</string>
+	<string>Entsperrgeräusch aktivieren</string>
 	<key>THEMES_APPLYTHEME_LABEL</key>
 	<string>Hintergrund wechseln</string>
 	<key>THEMES_FOOTER_TEXT</key>
