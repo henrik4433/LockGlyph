@@ -143,7 +143,7 @@ static void performShakeFingerFailAnimation(void) {
 		if (useFasterAnimations) {
 			delayInSeconds = 0.4;
 		}
-		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){ 
+		dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){
 			if (useTickAnimation) {
 				authenticated = YES;
 				performTickAnimation();
@@ -152,7 +152,7 @@ static void performShakeFingerFailAnimation(void) {
 				if (useFasterAnimations) {
 					delayInSeconds = 0.4;
 				}
-				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){ 
+				dispatch_after(dispatch_time(DISPATCH_TIME_NOW, delayInSeconds * NSEC_PER_SEC), dispatch_get_main_queue(), ^(void){
 					if (!useTickAnimation && useUnlockSound && unlockSound) {
 						AudioServicesPlaySystemSound(unlockSound);
 					}
@@ -181,12 +181,20 @@ static void performShakeFingerFailAnimation(void) {
 		fingerglyph.primaryColor = primaryColor;
 	}
 }
- 
+
  %new
 - (void)LG_ColorizeUI:(NSNotification *)notification {
 	NSDictionary *userInfo = [notification userInfo];
-	UIColor *primaryColor = userInfo[@"PrimaryColor"];
-	UIColor *secondaryColor = userInfo[@"SecondaryColor"];
+	UIColor *primaryColor;
+	UIColor *secondaryColor;
+	if([notification.name isEqualToString:@"ColorFlowLockScreenColorizationNotification"]) {
+		primaryColor = userInfo[@"PrimaryColor"];
+		secondaryColor = userInfo[@"SecondaryColor"];
+	}
+	else if([notification.name isEqualToString:@"CustomCoverLockScreenColourUpdateNotification"]) {
+		primaryColor = userInfo[@"PrimaryColour"];
+		secondaryColor = userInfo[@"SecondaryColour"];
+	}
 	if (enabled && usingGlyph && fingerglyph) {
 		fingerglyph.primaryColor = primaryColor;
 		fingerglyph.secondaryColor = secondaryColor;
@@ -195,29 +203,44 @@ static void performShakeFingerFailAnimation(void) {
 
 -(void)didMoveToWindow {
 	if (!self.window) {
-		NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
-		NSString *color = @"ColorFlowLockScreenColorizationNotification";
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+		NSString *CFRevert = @"ColorFlowLockScreenColorReversionNotification";
+		NSString *CFColor = @"ColorFlowLockScreenColorizationNotification";
+		NSString *CCRevert = @"CustomCoverLockScreenColourResetNotification";
+		NSString *CCColor = @"CustomCoverLockScreenColourUpdateNotification";
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CFRevert object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CFColor object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CCRevert object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CCColor object:nil];
 		fingerglyph = nil;
 		return;
 	}
 
 	if (enabled) {
 		// So we don't receive multiple notifications from over registering.
-		NSString *revert = @"ColorFlowLockScreenColorReversionNotification";
-		NSString *color = @"ColorFlowLockScreenColorizationNotification";
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:revert object:nil];
-		[[NSNotificationCenter defaultCenter] removeObserver:self name:color object:nil];
+		NSString *CFRevert = @"ColorFlowLockScreenColorReversionNotification";
+		NSString *CFColor = @"ColorFlowLockScreenColorizationNotification";
+		NSString *CCRevert = @"CustomCoverLockScreenColourResetNotification";
+		NSString *CCColor = @"CustomCoverLockScreenColourUpdateNotification";
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CFRevert object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CFColor object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CCRevert object:nil];
+		[[NSNotificationCenter defaultCenter] removeObserver:self name:CCColor object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self
 											 selector:@selector(LG_RevertUI:)
-												 name:revert
+												 name:CFRevert
 											   object:nil];
 		[[NSNotificationCenter defaultCenter] addObserver:self
 												 selector:@selector(LG_ColorizeUI:)
-													 name:color
+													 name:CFColor
 												   object:nil];
-
+	   [[NSNotificationCenter defaultCenter] addObserver:self
+											selector:@selector(LG_RevertUI:)
+												name:CCRevert
+											  object:nil];
+	   [[NSNotificationCenter defaultCenter] addObserver:self
+												selector:@selector(LG_ColorizeUI:)
+													name:CCColor
+												  object:nil];
 		lockView = (UIView *)self;
 		authenticated = NO;
 		usingGlyph = YES;
@@ -355,7 +378,7 @@ http://stackoverflow.com/a/26081621
 				delayInSeconds = 0.1;
 			}
 		}
-		unlockBlock = perform_block_after_delay(delayInSeconds, ^(void){ 
+		unlockBlock = perform_block_after_delay(delayInSeconds, ^(void){
 			if (!useTickAnimation && useUnlockSound && unlockSound) {
 				AudioServicesPlaySystemSound(unlockSound);
 			}
