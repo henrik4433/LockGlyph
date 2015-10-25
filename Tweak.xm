@@ -225,7 +225,7 @@ static void performShakeFingerFailAnimation(void) {
 		fingerglyph.delegate = (id<PKGlyphViewDelegate>)self;
 		fingerglyph.secondaryColor = secondaryColor;
 		fingerglyph.primaryColor = primaryColor;
-		if (themeAssets && [[NSFileManager defaultManager] fileExistsAtPath:[themeAssets pathForResource:@"IdleImage" ofType:@"png"]]) {
+		if (themeAssets && ([[NSFileManager defaultManager] fileExistsAtPath:[themeAssets pathForResource:@"IdleImage" ofType:@"png"]] || [[NSFileManager defaultManager] fileExistsAtPath:[themeAssets pathForResource:@"IdleImage@2x" ofType:@"png"]])) {
 			UIImage *customImage = [UIImage imageWithContentsOfFile:[themeAssets pathForResource:@"IdleImage" ofType:@"png"]];
 			fingerglyph.customImage = [UIImage imageWithCGImage:customImage.CGImage scale:[UIScreen mainScreen].scale orientation:customImage.imageOrientation];
 			[fingerglyph setState:5 animated:YES completionHandler:nil];
