@@ -91,13 +91,12 @@
 
 @implementation LockGlyphTitleCell
 
-- (id)initWithSpecifier:(PSSpecifier *)specifier
-{
-	self = [super initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"Cell"];
+- (instancetype)initWithStyle:(UITableViewCellStyle)style reuseIdentifier:(id)reuseIdentifier specifier:(id)specifier {
+	self = [super initWithStyle:style reuseIdentifier:reuseIdentifier specifier:specifier];
 
 	if (self) {
 
-		int width = [[UIScreen mainScreen] bounds].size.width;
+		int width = self.contentView.bounds.size.width;
 
 		CGRect frame = CGRectMake(0, 20, width, 60);
 		CGRect subtitleFrame = CGRectMake(0, 55, width, 60);
@@ -109,6 +108,8 @@
 		[tweakTitle setBackgroundColor:[UIColor clearColor]];
 		[tweakTitle setTextColor:[UIColor blackColor]];
 		[tweakTitle setTextAlignment:NSTextAlignmentCenter];
+		tweakTitle.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+		tweakTitle.contentMode = UIViewContentModeScaleToFill;
 
 		tweakSubtitle = [[UILabel alloc] initWithFrame:subtitleFrame];
 		[tweakSubtitle setNumberOfLines:1];
@@ -117,6 +118,8 @@
 		[tweakSubtitle setBackgroundColor:[UIColor clearColor]];
 		[tweakSubtitle setTextColor:[UIColor colorWithRed:119/255.0f green:119/255.0f blue:122/255.0f alpha:1.0f]];
 		[tweakSubtitle setTextAlignment:NSTextAlignmentCenter];
+		tweakSubtitle.autoresizingMask = UIViewAutoresizingFlexibleWidth;
+		tweakSubtitle.contentMode = UIViewContentModeScaleToFill;
 
 		[self addSubview:tweakTitle];
 		[self addSubview:tweakSubtitle];
@@ -125,8 +128,21 @@
 	return self;
 }
 
+- (instancetype)initWithSpecifier:(PSSpecifier *)specifier {
+	return [self initWithStyle:UITableViewCellStyleDefault reuseIdentifier:@"LockGlyphTitleCell" specifier:specifier];
+}
+
+- (void)setFrame:(CGRect)frame {
+	frame.origin.x = 0;
+	[super setFrame:frame];
+}
+
 - (CGFloat)preferredHeightForWidth:(CGFloat)arg1{
     return 125.0f;
+}
+
+- (CGFloat)preferredHeightForWidth:(CGFloat)width inTableView:(id)tableView {
+	return [self preferredHeightForWidth:width];
 }
 
 @end
