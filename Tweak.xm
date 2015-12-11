@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <AudioToolbox/AudioServices.h>
 #import "PKGlyphView.h"
-#import "SBLockScreenManager.h"
+#import "LockGlyph.h"
 #import "SpacemanBlocks.h"
 
 #define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
@@ -273,6 +273,7 @@ static void performShakeFingerFailAnimation(void) {
 		if (useShine) {
 			[self addShineAnimationToView:fingerglyph];
 		}
+		[[[[%c(SBLockScreenManager) sharedInstance] lockScreenViewController] lockScreenView] setSlideToUnlockHidden:YES forRequester:@"com.evilgoldfish.lockglyph"];
 		[self addSubview:fingerglyph];
 	}
 }
@@ -442,17 +443,6 @@ http://stackoverflow.com/a/26081621
 			AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 		}
 	}
-}
-
-%end
-
-%hook SBLockScreenView
-
-- (void)_layoutSlideToUnlockView {
-	if (enabled) {
-		return;
-	}
-	%orig;
 }
 
 %end

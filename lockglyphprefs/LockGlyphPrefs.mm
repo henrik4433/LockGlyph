@@ -1,7 +1,6 @@
 #import <Preferences/PSSpecifier.h>
 #import <Preferences/PSListController.h>
 #import <Preferences/PSTableCell.h>
-#import <Preferences/PSDetailController.h>
 
 #define kBundlePath @"/Library/Application Support/LockGlyph/Themes/"
 #define kSelfBundlePath @"/Library/PreferenceBundles/LockGlyphPrefs.bundle"
